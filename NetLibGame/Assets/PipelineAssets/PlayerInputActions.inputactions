@@ -1,0 +1,33 @@
+{
+    "name": "PlayerInputActions",
+    "maps": [
+        {
+            "name": "MenuNavigation",
+            "id": "c14e8baf-d18c-4159-818a-8882eb19af65",
+            "actions": [
+                {
+                    "name": "Enter",
+                    "type": "Button",
+                    "id": "c77a2bcc-8214-45e3-b2d1-7b36214d49a0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8fc10738-95c4-481b-a0c0-c28604e3f1a8",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Enter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
