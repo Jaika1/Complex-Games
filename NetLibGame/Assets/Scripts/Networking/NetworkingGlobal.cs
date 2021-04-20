@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
+[InitializeOnLoad]
 public static class NetworkingGlobal
 {
     private const uint SharedSecret = 0x1A7D2F9Bu;
@@ -22,6 +24,33 @@ public static class NetworkingGlobal
     public static UdpServer ServerInstance => udpSv;
     public static UdpClient ClientInstance => udpCl;
     public static List<WerewolfPlayer> ConnectedPlayers => players;
+
+
+    static NetworkingGlobal()
+    {
+#if UNITY_EDITOR
+        // We must shut down the server when the editor stops, since that doesn't happen automatically for us.
+        EditorApplication.playModeStateChanged += EditorApplication_playModeStateChanged;
+#else
+        // Similar scenario for a compiled executable to be safe.
+        Application.quitting += Application_quitting;
+#endif
+    }
+
+    private static void EditorApplication_playModeStateChanged(PlayModeStateChange obj)
+    {
+        if (obj == PlayModeStateChange.ExitingPlayMode)
+        {
+            CloseClientInstance();
+            CloseServerInstance();
+        }
+    }
+
+    private static void Application_quitting()
+    {
+        CloseClientInstance();
+        CloseServerInstance();
+    }
 
 
     public static void InitializeServerInstance()
@@ -43,6 +72,28 @@ public static class NetworkingGlobal
         udpCl.ClientDisconnected += ClientNetEvents.ClientDisconnectedEventHandler;
         udpCl.VerifyAndListen(ip, port);
         LocalPlayer = new WerewolfPlayer(udpCl);
+    }
+
+    public static void CloseServerInstance()
+    {
+        if (udpSv != null)
+        {
+            udpSv.CloseServer();
+            udpSv = null;
+            players = null;
+        }
+    }
+
+    public static void CloseClientInstance()
+    {
+        if (udpCl != null)
+        {
+            udpCl.Disconnect();
+            udpCl = null;
+
+            if (udpSv == null)
+                players = null;
+        }
     }
 
     #region Extension Methods

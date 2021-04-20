@@ -1,0 +1,193 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfLogicDemo\\WerewolfLogicDemo.csproj": {}
+  },
+  "projects": {
+    "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj",
+        "projectName": "TestWerewolfRoles",
+        "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj",
+        "packagesPath": "C:\\Users\\Jaika\\.nuget\\packages\\",
+        "outputPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Jaika\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj": {
+                "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj",
+        "projectName": "WerewolfDataLib",
+        "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj",
+        "packagesPath": "C:\\Users\\Jaika\\.nuget\\packages\\",
+        "outputPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Jaika\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "targetAlias": "netstandard2.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "targetAlias": "netstandard2.0",
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfLogicDemo\\WerewolfLogicDemo.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfLogicDemo\\WerewolfLogicDemo.csproj",
+        "projectName": "WerewolfLogicDemo",
+        "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfLogicDemo\\WerewolfLogicDemo.csproj",
+        "packagesPath": "C:\\Users\\Jaika\\.nuget\\packages\\",
+        "outputPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfLogicDemo\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Jaika\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj": {
+                "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj"
+              },
+              "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj": {
+                "projectPath": "D:\\AIE Year 2\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

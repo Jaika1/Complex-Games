@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "WerewolfLogicDemo/1.0.0": {
+        "dependencies": {
+          "TestWerewolfRoles": "1.0.0",
+          "WerewolfDataLib": "1.0.0"
+        },
+        "runtime": {
+          "WerewolfLogicDemo.dll": {}
+        }
+      },
+      "TestWerewolfRoles/1.0.0": {
+        "dependencies": {
+          "WerewolfDataLib": "1.0.0"
+        },
+        "runtime": {
+          "TestWerewolfRoles.dll": {}
+        }
+      },
+      "WerewolfDataLib/1.0.0": {
+        "runtime": {
+          "WerewolfDataLib.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "WerewolfLogicDemo/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TestWerewolfRoles/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WerewolfDataLib/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

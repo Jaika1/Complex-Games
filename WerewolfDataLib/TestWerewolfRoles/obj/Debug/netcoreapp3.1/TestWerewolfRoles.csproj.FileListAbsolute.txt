@@ -1,0 +1,12 @@
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\bin\Debug\netcoreapp3.1\TestWerewolfRoles.deps.json
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\bin\Debug\netcoreapp3.1\TestWerewolfRoles.dll
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\bin\Debug\netcoreapp3.1\TestWerewolfRoles.pdb
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\bin\Debug\netcoreapp3.1\WerewolfDataLib.dll
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\bin\Debug\netcoreapp3.1\WerewolfDataLib.pdb
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.csprojAssemblyReference.cache
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.AssemblyInfoInputs.cache
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.AssemblyInfo.cs
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.csproj.CoreCompileInputs.cache
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.csproj.CopyComplete
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.dll
+D:\AIE Year 2\Complex-Games\WerewolfDataLib\TestWerewolfRoles\obj\Debug\netcoreapp3.1\TestWerewolfRoles.pdb
