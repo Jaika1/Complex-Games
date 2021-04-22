@@ -35,32 +35,16 @@ public static class NetworkingGlobal
 
     static NetworkingGlobal()
     {
-#if UNITY_EDITOR
-        // We must shut down the server when the editor stops, since that doesn't happen automatically for us.
-        EditorApplication.playModeStateChanged += EditorApplication_playModeStateChanged;
-#else
-        // Similar scenario for a compiled executable to be safe.
-        Application.quitting += Application_quitting;
-#endif
+        // We must shut down the server and/or client when the editor stops, since that doesn't happen automatically for us.
+        Application.wantsToQuit += Application_quitting;
     }
 
-#if UNITY_EDITOR
-    private static void EditorApplication_playModeStateChanged(PlayModeStateChange obj)
-    {
-        if (obj == PlayModeStateChange.ExitingPlayMode)
-        {
-            CloseClientInstance();
-            CloseServerInstance();
-        }
-    }
-#endif
-
-    private static void Application_quitting()
+    private static bool Application_quitting()
     {
         CloseClientInstance();
         CloseServerInstance();
+        return true;
     }
-
 
     public static void InitializeServerInstance()
     {
@@ -86,24 +70,32 @@ public static class NetworkingGlobal
 
     public static void CloseServerInstance()
     {
-        if (udpSv != null)
+        try
         {
-            udpSv.CloseServer();
-            udpSv = null;
-            players = null;
+            if (udpSv != null)
+            {
+                udpSv.CloseServer();
+                udpSv = null;
+                players = null;
+            }
         }
+        catch { }
     }
 
     public static void CloseClientInstance()
     {
-        if (udpCl != null)
+        try
         {
-            udpCl.Disconnect();
-            udpCl = null;
+            if (udpCl != null)
+            {
+                udpCl.Disconnect();
+                udpCl = null;
 
-            if (udpSv == null)
-                players = null;
+                if (udpSv == null)
+                    players = null;
+            }
         }
+        catch { }
     }
 
     #region Extension Methods

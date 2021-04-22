@@ -13,13 +13,14 @@ public sealed class ClientNetEvents
 
     public static void ClientDisconnectedEventHandler(UdpClient client)
     {
-        ConnectedPlayers.Remove(client.GetPlayer());
+        //ConnectedPlayers.Remove(client.GetPlayer());
     }
 
     //public static event Action<NetWerewolfPlayer, bool> NetPlayerConnected;
     //public static event Action<NetWerewolfPlayer, string> ChatMessageReceived;
     public static UnityEvent<NetWerewolfPlayer, bool> NetPlayerConnected = new UnityEvent<NetWerewolfPlayer, bool>();
-    public static UnityEvent<NetWerewolfPlayer> NetPlayerDisconnected = new UnityEvent<NetWerewolfPlayer>();
+    public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
+    public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
 
     #endregion
 
@@ -59,14 +60,17 @@ public sealed class ClientNetEvents
         }
 
         if (ServerInstance == null)
-        {
-            NetWerewolfPlayer player = ConnectedPlayers.Find(p => p.PlayerID == pid);
-            ConnectedPlayers.Remove(player);
+            ConnectedPlayers.Remove(ConnectedPlayers.Find(p => p.PlayerID == pid));
 
-            // TODO: GameInfo removal (Maybe make dead if alive, and then remove once spectator?)
+        // TODO: GameInfo removal (Maybe make dead if alive, and then remove once spectator?)
             
-            NetPlayerDisconnected.Invoke(player);
-        }
+        NetPlayerDisconnected.Invoke(pid);
+    }
+
+    [NetDataEvent(5, ClientEventGroup)]
+    static void ReceivedChatMessage(UdpClient client, uint pid, string message)
+    {
+        ChatMessageReceived.Invoke(ConnectedPlayers.Find(p => p.PlayerID == pid), message);
     }
 
     [NetDataEvent(200, ClientEventGroup)]

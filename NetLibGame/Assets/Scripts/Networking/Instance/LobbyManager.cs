@@ -21,6 +21,7 @@ public class LobbyManager : MonoBehaviour
     {
         ClientNetEvents.NetPlayerConnected.AddListener(AddPlayerToList);
         ClientNetEvents.NetPlayerDisconnected.AddListener(RemovePlayerFromList);
+        ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
 
         if (NetworkingGlobal.FirstLobby)
         {
@@ -42,18 +43,29 @@ public class LobbyManager : MonoBehaviour
         });
     }
 
-    public void RemovePlayerFromList(NetWerewolfPlayer player)
+    public void RemovePlayerFromList(uint pid)
     {
-        LobbyPlayerPanelHelper pan = playerPanels.Find(p => p.PlayerID == player.PlayerID);
+        LobbyPlayerPanelHelper pan = playerPanels.Find(p => p.PlayerID == pid);
         playerPanels.Remove(pan);
 
         InvokerObj.Invoke(() => {
-            Destroy(pan);
+            Destroy(pan.gameObject);
         });
     }
 
-    public void WriteNetMessage(NetWerewolfPlayer player, string message)
+    public void WriteChatMessage(NetWerewolfPlayer player, string message)
     {
-        ChatTextField.text += $"{player.Name}: {message}{Environment.NewLine}";
+        InvokerObj.Invoke(() =>
+        {
+            ChatTextField.text += $"{player.Name}: {message}{Environment.NewLine}";
+        });
+    }
+
+    public void SendChatMessage(TMP_InputField field)
+    {
+        if (!string.IsNullOrWhiteSpace(field.text))
+            NetworkingGlobal.ClientInstance.Send(5, field.text); // BroadcastChatMessage(string);
+
+        field.text = string.Empty;
     }
 }

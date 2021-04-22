@@ -41,4 +41,12 @@ public sealed class ServerNetEvents
 
         ServerInstance.Send(1, playerRef.PlayerID, playerRef.Name); // UpdateClientInfo(uint, string)
     }
+
+    [NetDataEvent(5, ServerEventGroup)]
+    static void BroadcastChatMessage(UdpClient sender, string message)
+    {
+        NetWerewolfPlayer p = sender.GetPlayer();
+        if (p != null)
+            ServerInstance.Send(5, p.PlayerID, message); // ReceivedChatMessage(uint, string)
+    }
 }
