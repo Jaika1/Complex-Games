@@ -16,3 +16,19 @@ D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcorea
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.dll
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.pdb
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.genruntimeconfig.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.exe
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.deps.json
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.runtimeconfig.json
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.runtimeconfig.dev.json
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfLogicDemo.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\TestWerewolfRoles.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfDataLib.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\TestWerewolfRoles.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\bin\Debug\netcoreapp3.1\WerewolfDataLib.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.csprojAssemblyReference.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.AssemblyInfoInputs.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.AssemblyInfo.cs
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.csproj.CopyComplete
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfLogicDemo\obj\Debug\netcoreapp3.1\WerewolfLogicDemo.pdb

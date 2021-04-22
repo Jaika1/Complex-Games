@@ -5,25 +5,32 @@ using System.Net;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using WerewolfDataLib;
 
+#if UNITY_EDITOR
 [InitializeOnLoad]
+#endif
 public static class NetworkingGlobal
 {
     private const uint SharedSecret = 0x1A7D2F9Bu;
 
     private static UdpServer udpSv;
     private static UdpClient udpCl;
-    private static List<WerewolfPlayer> players;
+    private static List<NetWerewolfPlayer> players;
+    private static WerewolfGameInfo gameInfo;
 
     public const int ClientEventGroup = 0;
     public const int ServerEventGroup = 1;
 
-    public static WerewolfPlayer LocalPlayer;
-    public static bool FirstLobby;
+    public static NetWerewolfPlayer LocalPlayer;
+    public static bool FirstLobby = true;
+    public static IPAddress ClientConnectIP;
+    public static int ClientConnectPort;
 
     public static UdpServer ServerInstance => udpSv;
     public static UdpClient ClientInstance => udpCl;
-    public static List<WerewolfPlayer> ConnectedPlayers => players;
+    public static List<NetWerewolfPlayer> ConnectedPlayers => players;
+    public static WerewolfGameInfo GameInfo => gameInfo;
 
 
     static NetworkingGlobal()
@@ -37,6 +44,7 @@ public static class NetworkingGlobal
 #endif
     }
 
+#if UNITY_EDITOR
     private static void EditorApplication_playModeStateChanged(PlayModeStateChange obj)
     {
         if (obj == PlayModeStateChange.ExitingPlayMode)
@@ -45,6 +53,7 @@ public static class NetworkingGlobal
             CloseServerInstance();
         }
     }
+#endif
 
     private static void Application_quitting()
     {
@@ -55,7 +64,8 @@ public static class NetworkingGlobal
 
     public static void InitializeServerInstance()
     {
-        players = new List<WerewolfPlayer>();
+        gameInfo = new WerewolfGameInfo();
+        players = new List<NetWerewolfPlayer>();
         udpSv = new UdpServer(SharedSecret);
         udpSv.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ServerEventGroup);
         udpSv.ClientConnected += ServerNetEvents.ClientConnectedEventHandler;
@@ -65,13 +75,13 @@ public static class NetworkingGlobal
 
     public static void InitializeClientInstance(IPAddress ip, int port)
     {
-        FirstLobby = true;
-        players = new List<WerewolfPlayer>();
+        if (udpSv == null)
+            players = new List<NetWerewolfPlayer>();
         udpCl = new UdpClient(SharedSecret);
         udpCl.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ClientEventGroup);
         udpCl.ClientDisconnected += ClientNetEvents.ClientDisconnectedEventHandler;
         udpCl.VerifyAndListen(ip, port);
-        LocalPlayer = new WerewolfPlayer(udpCl);
+        LocalPlayer = new NetWerewolfPlayer(udpCl);
     }
 
     public static void CloseServerInstance()
@@ -98,9 +108,16 @@ public static class NetworkingGlobal
 
     #region Extension Methods
 
-    public static WerewolfPlayer GetPlayer(this UdpClient client)
+    public static NetWerewolfPlayer GetPlayer(this UdpClient client)
     {
-        return ConnectedPlayers.Find(p => p.PlayerClient.EndPoint.Equals(client.EndPoint));
+        for ( int i = 0; i < ConnectedPlayers.Count;  ++i)
+        {
+            NetWerewolfPlayer p = ConnectedPlayers[i];
+            if (p.PlayerClient != null)
+                if (p.PlayerClient.EndPoint.Equals(client.EndPoint))
+                    return p;
+        }
+        return null;
     }
 
     #endregion

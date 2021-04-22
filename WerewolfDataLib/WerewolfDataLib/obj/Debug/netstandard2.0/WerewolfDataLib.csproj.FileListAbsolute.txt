@@ -7,3 +7,11 @@ D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandar
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.csproj.CoreCompileInputs.cache
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.dll
 D:\AIE Year 2\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\bin\Debug\netstandard2.0\WerewolfDataLib.deps.json
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\bin\Debug\netstandard2.0\WerewolfDataLib.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\bin\Debug\netstandard2.0\WerewolfDataLib.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.csprojAssemblyReference.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.AssemblyInfoInputs.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.AssemblyInfo.cs
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\WerewolfDataLib\obj\Debug\netstandard2.0\WerewolfDataLib.pdb
