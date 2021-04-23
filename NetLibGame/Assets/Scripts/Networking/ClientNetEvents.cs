@@ -16,8 +16,6 @@ public sealed class ClientNetEvents
         //ConnectedPlayers.Remove(client.GetPlayer());
     }
 
-    //public static event Action<NetWerewolfPlayer, bool> NetPlayerConnected;
-    //public static event Action<NetWerewolfPlayer, string> ChatMessageReceived;
     public static UnityEvent<NetWerewolfPlayer, bool> NetPlayerConnected = new UnityEvent<NetWerewolfPlayer, bool>();
     public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
     public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
@@ -38,7 +36,7 @@ public sealed class ClientNetEvents
     {
         NetWerewolfPlayer player = ConnectedPlayers.FirstOrDefault(p => p.PlayerID == pid);
 
-        if (player.PlayerID != LocalPlayer.PlayerID && (player == null || ServerInstance != null))
+        if ((player == null && ServerInstance != null) || (/*player != null && */player.PlayerID != LocalPlayer.PlayerID))
         {
             player = new NetWerewolfPlayer(pid, name);
             if (ServerInstance == null)

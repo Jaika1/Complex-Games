@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Net;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class LobbyManager : MonoBehaviour
 {
     [Header("UI Components")]
     public Transform PlayerListContent;
+    public ScrollRect ChatScrollView;
     public TMP_Text ChatTextField;
 
     [Header("UI Prefabs")]
@@ -57,7 +60,10 @@ public class LobbyManager : MonoBehaviour
     {
         InvokerObj.Invoke(() =>
         {
+            //bool autoScrollChat = ChatScrollView.normalizedPosition == Vector2.zero;
             ChatTextField.text += $"{player.Name}: {message}{Environment.NewLine}";
+            //if (autoScrollChat)
+                ChatScrollView.normalizedPosition = Vector2.zero;
         });
     }
 

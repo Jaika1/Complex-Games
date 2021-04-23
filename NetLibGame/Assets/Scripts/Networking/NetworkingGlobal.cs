@@ -64,7 +64,7 @@ public static class NetworkingGlobal
         udpCl = new UdpClient(SharedSecret);
         udpCl.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ClientEventGroup);
         udpCl.ClientDisconnected += ClientNetEvents.ClientDisconnectedEventHandler;
-        udpCl.VerifyAndListen(ip, port);
+        bool success = udpCl.VerifyAndListen(ip, port);
         LocalPlayer = new NetWerewolfPlayer(udpCl);
     }
 

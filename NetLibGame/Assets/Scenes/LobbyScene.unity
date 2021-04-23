@@ -2893,6 +2893,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerListContent: {fileID: 1352229235}
+  ChatScrollView: {fileID: 1663412877}
   ChatTextField: {fileID: 184183499}
   LobbyPlayerPrefab: {fileID: 4578676630738595708, guid: 14d65c433ebb8f84090e4368029efb54, type: 3}
 --- !u!1 &2053705822
