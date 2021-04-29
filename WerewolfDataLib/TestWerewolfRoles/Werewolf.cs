@@ -11,7 +11,7 @@ namespace TestWerewolfRoles
 
         public Werewolf()
         {
-            RoleAlignment = null;
+            RoleAlignment = new WerewolfRoleAlignment();
             NightEvent = new WerewolfNightEvent();
         }
     }
@@ -25,6 +25,14 @@ namespace TestWerewolfRoles
         {
             Array.ForEach(TargetPlayers, p => p.AttackFrom(SourcePlayer));
             return TargetPlayers;
+        }
+    }
+
+    public class WerewolfRoleAlignment : IRoleAlignment
+    {
+        public bool CheckWinCondition(WerewolfGameInfo gameInfo, WerewolfPlayer[] players)
+        {
+            throw new NotImplementedException();
         }
     }
 }

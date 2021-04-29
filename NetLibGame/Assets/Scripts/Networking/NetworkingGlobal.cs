@@ -1,6 +1,8 @@
 ﻿using NetworkingLibrary;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using UnityEditor;
@@ -26,6 +28,8 @@ public static class NetworkingGlobal
     public static bool FirstLobby = true;
     public static IPAddress ClientConnectIP;
     public static int ClientConnectPort;
+    public static Dictionary<string, Type> LoadedRoleTypes;// = new Dictionary<string, Type>();
+    public static List<string> LoadedRoleHashes;
 
     public static UdpServer ServerInstance => udpSv;
     public static UdpClient ClientInstance => udpCl;
@@ -37,6 +41,8 @@ public static class NetworkingGlobal
     {
         // We must shut down the server and/or client when the editor stops, since that doesn't happen automatically for us.
         Application.wantsToQuit += Application_quitting;
+        LoadedRoleTypes = WerewolfGameInfo.LoadRolesFromAssemblies(Assembly.GetExecutingAssembly());
+        LoadedRoleHashes = WerewolfGameInfo.GenerateRoleHashes(LoadedRoleTypes.Values.ToArray());
     }
 
     private static bool Application_quitting()
@@ -48,7 +54,7 @@ public static class NetworkingGlobal
 
     public static void InitializeServerInstance()
     {
-        gameInfo = new WerewolfGameInfo();
+        gameInfo = new WerewolfGameInfo(LoadedRoleTypes);
         players = new List<NetWerewolfPlayer>();
         udpSv = new UdpServer(SharedSecret);
         udpSv.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ServerEventGroup);

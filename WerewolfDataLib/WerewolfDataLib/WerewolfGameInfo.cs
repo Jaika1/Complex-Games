@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using WerewolfDataLib.Interfaces;
 
@@ -9,6 +10,7 @@ namespace WerewolfDataLib
 {
     public class WerewolfGameInfo
     {
+        private static MD5 hasher = MD5.Create();
         private uint nextPid = 0u;
         private Random random = new Random();
         private Dictionary<string, Type> loadedRoleTypes = new Dictionary<string, Type>();
@@ -18,17 +20,32 @@ namespace WerewolfDataLib
         public List<WerewolfPlayer> Players => playerList;
 
 
-        public WerewolfGameInfo(params Assembly[] roleAssemblies)
+        public WerewolfGameInfo(Dictionary<string, Type> roles)
         {
+            loadedRoleTypes = roles;
+        }
+
+        public static Dictionary<string, Type> LoadRolesFromAssemblies(params Assembly[] roleAssemblies)
+        {
+            Dictionary<string, Type> dict = new Dictionary<string, Type>();
+
             List<Type> roleTypes = (from a in roleAssemblies
                                     from t in a.GetTypes()
                                     where t.BaseType == typeof(WerewolfRole)
                                     select t).ToList();
 
             foreach (Type t in roleTypes)
-                loadedRoleTypes.Add((Activator.CreateInstance(t) as WerewolfRole).RoleName, t);
+                dict.Add((Activator.CreateInstance(t) as WerewolfRole).RoleName, t);
+
+            return dict;
         }
 
+        public static List<string> GenerateRoleHashes(Type[] roleTypes)
+        {
+            return (from roleType in roleTypes
+                    let utf8Bytes = Encoding.UTF8.GetBytes(roleType.AssemblyQualifiedName)
+                    select string.Join(string.Empty, hasher.ComputeHash(utf8Bytes).Select(x => x.ToString("X")))).ToList();
+        }
 
         public WerewolfPlayer AddPlayerAndAssignId(WerewolfPlayer instance = null)
         {

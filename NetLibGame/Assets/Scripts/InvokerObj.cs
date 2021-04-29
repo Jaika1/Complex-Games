@@ -26,8 +26,16 @@ public class InvokerObj : MonoBehaviour
 #else
             NetBase.DebugInfoReceived += NetBase_DebugInfoReceived;
 #endif
+            Application.wantsToQuit += Application_quitting;
         }
     }
+
+    private bool Application_quitting()
+    {
+        NetBase.DebugInfoReceived -= NetBase_DebugInfoReceived;
+        return true;
+    }
+
     private void NetBase_DebugInfoReceived(string msg)
     {
         try
@@ -42,6 +50,7 @@ public class InvokerObj : MonoBehaviour
             });
         }
     }
+
     public void CopyLogToClipboard()
     {
         GUIUtility.systemCopyBuffer = DebugTextRef.text;
@@ -86,8 +95,12 @@ public sealed class Invokee
 
     public static object operator ~(Invokee self)
     {
-        while (!self.Done)
-            Thread.Sleep(1);
-        return self.Output;
+        if (self.Method.ReturnType != typeof(void))
+        {
+            while (!self.Done)
+                Thread.Sleep(1);
+            return self.Output;
+        }
+        return null;
     }
 }

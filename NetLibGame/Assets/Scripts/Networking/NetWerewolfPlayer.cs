@@ -8,6 +8,8 @@ public class NetWerewolfPlayer : WerewolfPlayer
 {
     private UdpClient clientRef;
 
+    internal bool IsHost = false;
+
     public bool RoleListVerified = false;
     public string Name = "ERROR";
 

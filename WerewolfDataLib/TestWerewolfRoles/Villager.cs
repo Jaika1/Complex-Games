@@ -12,8 +12,16 @@ namespace TestWerewolfRoles
 
         public Villager()
         {
-            RoleAlignment = null;
+            RoleAlignment = new VillagerRoleAlignment();
             NightEvent = null;
+        }
+    }
+
+    public class VillagerRoleAlignment : IRoleAlignment
+    {
+        public bool CheckWinCondition(WerewolfGameInfo gameInfo, WerewolfPlayer[] players)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -13,9 +13,13 @@ public class LobbyManager : MonoBehaviour
     public Transform PlayerListContent;
     public ScrollRect ChatScrollView;
     public TMP_Text ChatTextField;
+    public RectTransform HostRoleListPanel;
+    public RectTransform ClientRoleListPanel;
+    public RectTransform LoadedRolesListContent;
 
     [Header("UI Prefabs")]
     public LobbyPlayerPanelHelper LobbyPlayerPrefab;
+    public LobbyHostRoleHelper HostRoleItemPrefab;
 
     private List<LobbyPlayerPanelHelper> playerPanels = new List<LobbyPlayerPanelHelper>();
 
@@ -25,6 +29,7 @@ public class LobbyManager : MonoBehaviour
         ClientNetEvents.NetPlayerConnected.AddListener(AddPlayerToList);
         ClientNetEvents.NetPlayerDisconnected.AddListener(RemovePlayerFromList);
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
+        ClientNetEvents.UpdateHostBox.AddListener(UpdateHostBox);
 
         if (NetworkingGlobal.FirstLobby)
         {
@@ -35,6 +40,23 @@ public class LobbyManager : MonoBehaviour
             else
                 NetworkingGlobal.InitializeClientInstance(NetworkingGlobal.ClientConnectIP, NetworkingGlobal.ClientConnectPort);
         }
+
+        foreach(string rName in NetworkingGlobal.LoadedRoleTypes.Keys)
+        {
+            LobbyHostRoleHelper h = Instantiate(HostRoleItemPrefab, LoadedRolesListContent);
+            h.SetupTextAndEvent(rName, () => { });
+        }
+
+        UpdateHostBox(NetworkingGlobal.LocalPlayer.IsHost);
+    }
+
+    private void UpdateHostBox(bool isHost)
+    {
+        InvokerObj.Invoke(() =>
+        {
+            HostRoleListPanel.gameObject.SetActive(isHost);
+            ClientRoleListPanel.gameObject.SetActive(!isHost);
+        });
     }
 
     public void AddPlayerToList(NetWerewolfPlayer player, bool localPlayer)
@@ -61,7 +83,7 @@ public class LobbyManager : MonoBehaviour
         InvokerObj.Invoke(() =>
         {
             //bool autoScrollChat = ChatScrollView.normalizedPosition == Vector2.zero;
-            ChatTextField.text += $"{player.Name}: {message}{Environment.NewLine}";
+            ChatTextField.text += $"[{player.PlayerID}] {player.Name}: {message}{Environment.NewLine}";
             //if (autoScrollChat)
                 ChatScrollView.normalizedPosition = Vector2.zero;
         });

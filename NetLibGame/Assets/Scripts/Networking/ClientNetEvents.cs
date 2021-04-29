@@ -19,6 +19,7 @@ public sealed class ClientNetEvents
     public static UnityEvent<NetWerewolfPlayer, bool> NetPlayerConnected = new UnityEvent<NetWerewolfPlayer, bool>();
     public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
     public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
+    public static UnityEvent<bool> UpdateHostBox = new UnityEvent<bool>();
 
     #endregion
 
@@ -28,7 +29,7 @@ public sealed class ClientNetEvents
     {
         // TODO
 
-        client.Send(0, "Player", new ulong[0]); // VerifyRoleHashesAndSendClientList(ulong[])
+        client.Send(0, "Player", LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
     }
 
     [NetDataEvent(1, ClientEventGroup)]
@@ -65,10 +66,19 @@ public sealed class ClientNetEvents
         NetPlayerDisconnected.Invoke(pid);
     }
 
+
     [NetDataEvent(5, ClientEventGroup)]
     static void ReceivedChatMessage(UdpClient client, uint pid, string message)
     {
         ChatMessageReceived.Invoke(ConnectedPlayers.Find(p => p.PlayerID == pid), message);
+    }
+
+
+    [NetDataEvent(199, ClientEventGroup)]
+    static void SetHost(UdpClient client, bool isHost)
+    {
+        LocalPlayer.IsHost = isHost;
+        UpdateHostBox.Invoke(isHost);
     }
 
     [NetDataEvent(200, ClientEventGroup)]
