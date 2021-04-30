@@ -40,13 +40,15 @@ public class InvokerObj : MonoBehaviour
     {
         try
         {
-            DebugTextRef.text += $"{msg}{Environment.NewLine}";
+            //DebugTextRef.text += $"{msg}{Environment.NewLine}";
+            Debug.Log(msg);
         }
         catch
         {
             Invoke(() =>
             {
-                DebugTextRef.text += $"{msg}{Environment.NewLine}";
+                //DebugTextRef.text += $"{msg}{Environment.NewLine}";
+                Debug.Log(msg);
             });
         }
     }
@@ -68,14 +70,14 @@ public class InvokerObj : MonoBehaviour
         }
     }
 
-    public static void Invoke(Action a)
+    public static void Invoke(Action a, bool waitForCompletion = false)
     {
-        _ = ~new Invokee(a.Target, a.Method);
+        _ = ~new Invokee(a.Target, a.Method, waitForCompletion);
     }
 
     public static TOut Invoke<TOut>(Func<TOut> f)
     {
-        return (TOut)~new Invokee(f.Target, f.Method);
+        return (TOut)~new Invokee(f.Target, f.Method, true);
     }
 }
 
@@ -85,9 +87,11 @@ public sealed class Invokee
     public object MethodInstance;
     public MethodInfo Method;
     public object Output = null;
+    private bool wfc;
 
-    public Invokee(object instance, MethodInfo a)
+    public Invokee(object instance, MethodInfo a, bool waitForCompletion = false)
     {
+        wfc = waitForCompletion;
         MethodInstance = instance;
         Method = a;
         InvokerObj.ToInvoke.Add(this);
@@ -95,7 +99,7 @@ public sealed class Invokee
 
     public static object operator ~(Invokee self)
     {
-        if (self.Method.ReturnType != typeof(void))
+        if (self.wfc || self.Method.ReturnType != typeof(void))
         {
             while (!self.Done)
                 Thread.Sleep(1);

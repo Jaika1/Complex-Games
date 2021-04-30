@@ -16,12 +16,17 @@ public class LobbyManager : MonoBehaviour
     public RectTransform HostRoleListPanel;
     public RectTransform ClientRoleListPanel;
     public RectTransform LoadedRolesListContent;
+    public RectTransform HostRolesListContent;
+    public RectTransform ClientRolesListContent;
 
     [Header("UI Prefabs")]
     public LobbyPlayerPanelHelper LobbyPlayerPrefab;
     public LobbyHostRoleHelper HostRoleItemPrefab;
+    public LobbyHostRoleHelper ClientRoleItemPrefab;
 
     private List<LobbyPlayerPanelHelper> playerPanels = new List<LobbyPlayerPanelHelper>();
+    private List<LobbyHostRoleHelper> hostRolePanels = new List<LobbyHostRoleHelper>();
+    private List<LobbyHostRoleHelper> clientRolePanels = new List<LobbyHostRoleHelper>();
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +35,7 @@ public class LobbyManager : MonoBehaviour
         ClientNetEvents.NetPlayerDisconnected.AddListener(RemovePlayerFromList);
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
         ClientNetEvents.UpdateHostBox.AddListener(UpdateHostBox);
+        ClientNetEvents.UpdateActiveRoleList.AddListener(UpdateActiveRoleList);
 
         if (NetworkingGlobal.FirstLobby)
         {
@@ -41,13 +47,55 @@ public class LobbyManager : MonoBehaviour
                 NetworkingGlobal.InitializeClientInstance(NetworkingGlobal.ClientConnectIP, NetworkingGlobal.ClientConnectPort);
         }
 
-        foreach(string rName in NetworkingGlobal.LoadedRoleTypes.Keys)
+        foreach(string rHash in NetworkingGlobal.LoadedRoleHashes)
         {
             LobbyHostRoleHelper h = Instantiate(HostRoleItemPrefab, LoadedRolesListContent);
-            h.SetupTextAndEvent(rName, () => { });
+            h.SetupTextAndEvent(rHash, false);
         }
 
+        ChatTextField.autoSizeTextContainer = true;
+
         UpdateHostBox(NetworkingGlobal.LocalPlayer.IsHost);
+    }
+
+    private void FixedUpdate()
+    {
+        Debug.Log(ChatScrollView.verticalNormalizedPosition);
+    }
+
+    private void UpdateActiveRoleList(string roleHash, bool remove)
+    {
+        // TODO: non-host role list
+
+        if (remove)
+        {
+            int activeIndex = hostRolePanels.FindIndex(x => x.RoleHash == roleHash);
+
+            if (activeIndex == -1)
+                return;
+
+            InvokerObj.Invoke(() =>
+            {
+                Destroy(hostRolePanels[activeIndex].gameObject);
+                hostRolePanels.RemoveAt(activeIndex);
+
+                Destroy(clientRolePanels[activeIndex].gameObject);
+                clientRolePanels.RemoveAt(activeIndex);
+            });
+        }
+        else
+        {
+            InvokerObj.Invoke(() =>
+            {
+                LobbyHostRoleHelper rp = Instantiate(HostRoleItemPrefab, HostRolesListContent);
+                rp.SetupTextAndEvent(roleHash, true);
+                hostRolePanels.Add(rp);
+
+                LobbyHostRoleHelper rpc = Instantiate(ClientRoleItemPrefab, ClientRolesListContent);
+                rpc.SetupTextAndEvent(roleHash, false);
+                clientRolePanels.Add(rpc);
+            });
+        }
     }
 
     private void UpdateHostBox(bool isHost)
@@ -82,9 +130,16 @@ public class LobbyManager : MonoBehaviour
     {
         InvokerObj.Invoke(() =>
         {
-            //bool autoScrollChat = ChatScrollView.normalizedPosition == Vector2.zero;
-            ChatTextField.text += $"[{player.PlayerID}] {player.Name}: {message}{Environment.NewLine}";
-            //if (autoScrollChat)
+            float oldPos = ChatScrollView.normalizedPosition.y;
+
+            if (player != null)
+                ChatTextField.text += $"[{player.PlayerID}] {player.Name}: {message}{Environment.NewLine}";
+            else
+                ChatTextField.text += $"SYSTEM: {message}{Environment.NewLine}";
+            
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)ChatScrollView.transform);
+
+            if (oldPos <= 0.0001f)
                 ChatScrollView.normalizedPosition = Vector2.zero;
         });
     }
@@ -95,5 +150,10 @@ public class LobbyManager : MonoBehaviour
             NetworkingGlobal.ClientInstance.Send(5, field.text); // BroadcastChatMessage(string);
 
         field.text = string.Empty;
+    }
+
+    public void SendTryStartGame()
+    {
+        NetworkingGlobal.ClientInstance.Send(191);
     }
 }

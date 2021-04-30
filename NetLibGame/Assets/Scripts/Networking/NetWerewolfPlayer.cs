@@ -11,14 +11,15 @@ public class NetWerewolfPlayer : WerewolfPlayer
     internal bool IsHost = false;
 
     public bool RoleListVerified = false;
-    public string Name = "ERROR";
+    public string Name;
 
     public bool HasVerified => RoleListVerified;
     public UdpClient PlayerClient => clientRef;
 
 
-    public NetWerewolfPlayer(UdpClient clientRef)
+    public NetWerewolfPlayer(UdpClient clientRef, string name = "ERROR")
     {
+        Name = name;
         this.clientRef = clientRef;
     }
 

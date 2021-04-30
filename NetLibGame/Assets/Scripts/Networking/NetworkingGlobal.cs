@@ -24,12 +24,14 @@ public static class NetworkingGlobal
     public const int ClientEventGroup = 0;
     public const int ServerEventGroup = 1;
 
+    public static string PlayerName = $"Player{UnityEngine.Random.Range(1000,9999)}";
     public static NetWerewolfPlayer LocalPlayer;
     public static bool FirstLobby = true;
     public static IPAddress ClientConnectIP;
     public static int ClientConnectPort;
     public static Dictionary<string, Type> LoadedRoleTypes;// = new Dictionary<string, Type>();
     public static List<string> LoadedRoleHashes;
+    public static List<string> ActiveRoleHashes = new List<string>();
 
     public static UdpServer ServerInstance => udpSv;
     public static UdpClient ClientInstance => udpCl;
@@ -68,10 +70,10 @@ public static class NetworkingGlobal
         if (udpSv == null)
             players = new List<NetWerewolfPlayer>();
         udpCl = new UdpClient(SharedSecret);
+        LocalPlayer = new NetWerewolfPlayer(udpCl, PlayerName);
         udpCl.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ClientEventGroup);
         udpCl.ClientDisconnected += ClientNetEvents.ClientDisconnectedEventHandler;
         bool success = udpCl.VerifyAndListen(ip, port);
-        LocalPlayer = new NetWerewolfPlayer(udpCl);
     }
 
     public static void CloseServerInstance()
@@ -102,6 +104,26 @@ public static class NetworkingGlobal
             }
         }
         catch { }
+    }
+
+    public static string GetRoleNameFromHash(string roleHash)
+    {
+        int roleIndex = LoadedRoleHashes.IndexOf(roleHash);
+
+        if (roleIndex != -1)
+            return LoadedRoleTypes.Keys.ElementAt(roleIndex);
+
+        return string.Empty;
+    }
+
+    public static string GetRoleHashFromType(Type roleType)
+    {
+        int roleIndex = LoadedRoleTypes.Values.ToList().IndexOf(roleType);
+
+        if (roleIndex != -1)
+            return LoadedRoleHashes.ElementAt(roleIndex);
+
+        return string.Empty;
     }
 
     #region Extension Methods

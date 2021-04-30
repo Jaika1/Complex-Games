@@ -20,6 +20,7 @@ public sealed class ClientNetEvents
     public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
     public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
     public static UnityEvent<bool> UpdateHostBox = new UnityEvent<bool>();
+    public static UnityEvent<string, bool> UpdateActiveRoleList = new UnityEvent<string, bool>();
 
     #endregion
 
@@ -27,9 +28,7 @@ public sealed class ClientNetEvents
     [NetDataEvent(0, ClientEventGroup)]
     static void CreateRoleHashesAndVerify(UdpClient client)
     {
-        // TODO
-
-        client.Send(0, "Player", LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
+        client.Send(0, LocalPlayer.Name, LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
     }
 
     [NetDataEvent(1, ClientEventGroup)]
@@ -37,7 +36,7 @@ public sealed class ClientNetEvents
     {
         NetWerewolfPlayer player = ConnectedPlayers.FirstOrDefault(p => p.PlayerID == pid);
 
-        if ((player == null && ServerInstance != null) || (/*player != null && */player.PlayerID != LocalPlayer.PlayerID))
+        if ((player == null) || (player.PlayerID != LocalPlayer.PlayerID))
         {
             player = new NetWerewolfPlayer(pid, name);
             if (ServerInstance == null)
@@ -66,13 +65,17 @@ public sealed class ClientNetEvents
         NetPlayerDisconnected.Invoke(pid);
     }
 
-
     [NetDataEvent(5, ClientEventGroup)]
     static void ReceivedChatMessage(UdpClient client, uint pid, string message)
     {
         ChatMessageReceived.Invoke(ConnectedPlayers.Find(p => p.PlayerID == pid), message);
     }
 
+    [NetDataEvent(190, ClientEventGroup)]
+    static void ModifyActiveRoleList(UdpClient sender, string roleHash, bool remove)
+    {
+        UpdateActiveRoleList.Invoke(roleHash, remove);
+    }
 
     [NetDataEvent(199, ClientEventGroup)]
     static void SetHost(UdpClient client, bool isHost)
