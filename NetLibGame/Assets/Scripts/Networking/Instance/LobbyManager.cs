@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
@@ -18,6 +19,7 @@ public class LobbyManager : MonoBehaviour
     public RectTransform LoadedRolesListContent;
     public RectTransform HostRolesListContent;
     public RectTransform ClientRolesListContent;
+    public TMP_InputField ChatBoxInputField;
 
     [Header("UI Prefabs")]
     public LobbyPlayerPanelHelper LobbyPlayerPrefab;
@@ -31,11 +33,13 @@ public class LobbyManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ClientNetEvents.NetPlayerConnected.AddListener(AddPlayerToList);
-        ClientNetEvents.NetPlayerDisconnected.AddListener(RemovePlayerFromList);
+        ClientNetEvents.UpdatePlayerList.AddListener(PlayerListUpdated);
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
         ClientNetEvents.UpdateHostBox.AddListener(UpdateHostBox);
         ClientNetEvents.UpdateActiveRoleList.AddListener(UpdateActiveRoleList);
+        ClientNetEvents.SwitchingToGame.AddListener(Switching);
+
+        ChatBoxInputField.onSubmit.AddListener(SendChatMessage);
 
         if (NetworkingGlobal.FirstLobby)
         {
@@ -58,9 +62,39 @@ public class LobbyManager : MonoBehaviour
         UpdateHostBox(NetworkingGlobal.LocalPlayer.IsHost);
     }
 
-    private void FixedUpdate()
+    private void Switching()
     {
-        Debug.Log(ChatScrollView.verticalNormalizedPosition);
+        InvokerObj.Invoke(() =>
+        {
+            ClientNetEvents.UpdatePlayerList.RemoveListener(PlayerListUpdated);
+            ClientNetEvents.ChatMessageReceived.RemoveListener(WriteChatMessage);
+            ClientNetEvents.UpdateHostBox.RemoveListener(UpdateHostBox);
+            ClientNetEvents.UpdateActiveRoleList.RemoveListener(UpdateActiveRoleList);
+            ClientNetEvents.SwitchingToGame.RemoveListener(Switching);
+
+            SceneManager.LoadScene("GameScene");
+        });
+    }
+
+    private void PlayerListUpdated(uint pid, bool remove)
+    {
+        if (remove)
+        {
+            LobbyPlayerPanelHelper pan = playerPanels.Find(p => p.PlayerID == pid);
+            playerPanels.Remove(pan);
+
+            InvokerObj.Invoke(() => {
+                Destroy(pan.gameObject);
+            });
+        }
+        else
+        {
+            InvokerObj.Invoke(() => {
+                LobbyPlayerPanelHelper newPlayer = Instantiate(LobbyPlayerPrefab, PlayerListContent);
+                newPlayer.SetupText(NetworkingGlobal.ConnectedPlayers.Find(p => p.PlayerID == pid), NetworkingGlobal.LocalPlayer.PlayerID == pid);
+                playerPanels.Add(newPlayer);
+            });
+        }
     }
 
     private void UpdateActiveRoleList(string roleHash, bool remove)
@@ -116,16 +150,6 @@ public class LobbyManager : MonoBehaviour
         });
     }
 
-    public void RemovePlayerFromList(uint pid)
-    {
-        LobbyPlayerPanelHelper pan = playerPanels.Find(p => p.PlayerID == pid);
-        playerPanels.Remove(pan);
-
-        InvokerObj.Invoke(() => {
-            Destroy(pan.gameObject);
-        });
-    }
-
     public void WriteChatMessage(NetWerewolfPlayer player, string message)
     {
         InvokerObj.Invoke(() =>
@@ -144,12 +168,14 @@ public class LobbyManager : MonoBehaviour
         });
     }
 
-    public void SendChatMessage(TMP_InputField field)
+    public void SendChatMessage(string submission)
     {
-        if (!string.IsNullOrWhiteSpace(field.text))
-            NetworkingGlobal.ClientInstance.Send(5, field.text); // BroadcastChatMessage(string);
+        if (!string.IsNullOrWhiteSpace(submission))
+            NetworkingGlobal.ClientInstance.Send(5, submission); // BroadcastChatMessage(string);
 
-        field.text = string.Empty;
+        ChatBoxInputField.text = string.Empty;
+        ChatBoxInputField.Select();
+        ChatBoxInputField.ActivateInputField();
     }
 
     public void SendTryStartGame()

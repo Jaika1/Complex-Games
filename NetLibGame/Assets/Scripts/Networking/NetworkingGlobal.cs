@@ -126,6 +126,16 @@ public static class NetworkingGlobal
         return string.Empty;
     }
 
+    public static Type GetRoleTypeFromHash(string roleHash)
+    {
+        int roleIndex = LoadedRoleHashes.IndexOf(roleHash);
+
+        if (roleIndex != -1)
+            return LoadedRoleTypes.Values.ElementAt(roleIndex);
+
+        return null;
+    }
+
     #region Extension Methods
 
     public static NetWerewolfPlayer GetPlayer(this UdpClient client)
@@ -138,6 +148,11 @@ public static class NetworkingGlobal
                     return p;
         }
         return null;
+    }
+
+    public static UnityEngine.Color ToUnityColor(this System.Drawing.Color c)
+    {
+        return new UnityEngine.Color(c.R / 255.0f, c.G / 255.0f, c.B / 255.0f, c.A / 255.0f);
     }
 
     #endregion

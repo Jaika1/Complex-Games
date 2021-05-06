@@ -35,7 +35,7 @@ namespace WerewolfDataLib
                                     select t).ToList();
 
             foreach (Type t in roleTypes)
-                dict.Add((Activator.CreateInstance(t) as WerewolfRole).RoleName, t);
+                dict.Add((Activator.CreateInstance(t) as WerewolfRole).Name, t);
 
             return dict;
         }

@@ -5,11 +5,12 @@ using WerewolfDataLib;
 
 public class Werewolf : WerewolfRole
 {
-    public override string RoleName => "Werewolf";
+    public override string Name => "Werewolf";
+    public override string Description => "Work with the other werewolves to slay the town and gain a player majority.";
 
     public Werewolf()
     {
-        RoleAlignment = new WerewolfRoleAlignment();
+        Alignment = new WerewolfRoleAlignment();
         NightEvent = new WerewolfNightEvent();
     }
 }

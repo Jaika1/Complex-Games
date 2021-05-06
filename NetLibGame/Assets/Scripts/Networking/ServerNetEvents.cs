@@ -10,6 +10,7 @@ using static NetworkingGlobal;
 public sealed class ServerNetEvents
 {
     static System.Random rand = new System.Random();
+    const int MIN_PLAYERS = 2;
 
     #region Event handlers
 
@@ -118,7 +119,18 @@ public sealed class ServerNetEvents
     {
         NetWerewolfPlayer p = sender.GetPlayer();
         if (p != null)
-            ServerInstance.Send(5, p.PlayerID, message); // ReceivedChatMessage(uint, string)
+        {
+            double secondsSinceLast = (DateTime.Now - p.LastMessageTime).TotalSeconds;
+            if (secondsSinceLast >= 3.5)
+            {
+                ServerInstance.Send(5, p.PlayerID, message); // ReceivedChatMessage(uint, string)
+                p.LastMessageTime = DateTime.Now;
+            }
+            else
+            {
+                sender.Send(5, 0, $"Please wait another {Math.Round(3.5 - secondsSinceLast, 1)} seconds before sending another message."); // ReceivedChatMessage(uint, string)
+            }
+        }
     }
 
     [NetDataEvent(190, ServerEventGroup)]
@@ -144,14 +156,14 @@ public sealed class ServerNetEvents
     [NetDataEvent(191, ServerEventGroup)]
     static void TryStartGame(UdpClient sender)
     {
-        if (GameInfo.Players.Count < 4)
+        if (GameInfo.Players.Count < MIN_PLAYERS)
         {
-            sender.Send(5, 0u, "There must be at least 4 players to start the round.");
+            sender.Send(5, 0u, $"There must be at least {MIN_PLAYERS} players to start the round.");
             return;
         }
-        if (ActiveRoleHashes.Count < 4)
+        if (ActiveRoleHashes.Count < MIN_PLAYERS)
         {
-            sender.Send(5, 0u, "There must be enough roles in the active list for at least 4 players.");
+            sender.Send(5, 0u, $"There must be enough roles in the active list for at least {MIN_PLAYERS} players.");
             return;
         }
         if (ActiveRoleHashes.Count > GameInfo.Players.Count)
@@ -172,6 +184,7 @@ public sealed class ServerNetEvents
 
         GameInfo.AssignRolesAndSpectators(ActiveRoleHashes.Count, roleTypes);
 
-        ServerInstance.Send(191);
+        foreach (NetWerewolfPlayer p in ConnectedPlayers)
+            p.PlayerClient.Send(191, GetRoleHashFromType(p.Role.GetType()));
     }
 }

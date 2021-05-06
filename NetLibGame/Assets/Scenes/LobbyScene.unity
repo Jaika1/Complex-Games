@@ -1865,7 +1865,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 273244949}
   m_HandleRect: {fileID: 273244948}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2887,7 +2887,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1532881026}
   m_HandleRect: {fileID: 1532881025}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5783,6 +5783,7 @@ MonoBehaviour:
   LoadedRolesListContent: {fileID: 1965419768}
   HostRolesListContent: {fileID: 1416236674}
   ClientRolesListContent: {fileID: 1360322720}
+  ChatBoxInputField: {fileID: 1225141940}
   LobbyPlayerPrefab: {fileID: 4578676630738595708, guid: 14d65c433ebb8f84090e4368029efb54, type: 3}
   HostRoleItemPrefab: {fileID: 1297611875372228289, guid: cdd2fc667a2064f43872819e7a71ac4b, type: 3}
   ClientRoleItemPrefab: {fileID: 7242357084945115618, guid: 856a5a98aed9b214f8180ba15c4048e6, type: 3}

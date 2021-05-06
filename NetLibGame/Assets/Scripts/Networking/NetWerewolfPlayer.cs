@@ -1,4 +1,5 @@
 ﻿using NetworkingLibrary;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class NetWerewolfPlayer : WerewolfPlayer
     private UdpClient clientRef;
 
     internal bool IsHost = false;
+    internal DateTime LastMessageTime = DateTime.MinValue;
 
     public bool RoleListVerified = false;
     public string Name;

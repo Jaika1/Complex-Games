@@ -7,9 +7,10 @@ namespace WerewolfDataLib
 {
     public abstract class WerewolfRole
     {
-        public abstract string RoleName { get; }
+        public abstract string Name { get; }
+        public abstract string Description { get; }
 
-        public IRoleAlignment RoleAlignment;
+        public IRoleAlignment Alignment;
         public NightEvent NightEvent;
     }
 }

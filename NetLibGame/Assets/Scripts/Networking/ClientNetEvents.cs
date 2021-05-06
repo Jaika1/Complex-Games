@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using WerewolfDataLib;
 using static NetworkingGlobal;
 
 public sealed class ClientNetEvents
@@ -16,11 +17,13 @@ public sealed class ClientNetEvents
         //ConnectedPlayers.Remove(client.GetPlayer());
     }
 
-    public static UnityEvent<NetWerewolfPlayer, bool> NetPlayerConnected = new UnityEvent<NetWerewolfPlayer, bool>();
-    public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
+    //public static UnityEvent<NetWerewolfPlayer, bool> NetPlayerConnected = new UnityEvent<NetWerewolfPlayer, bool>();
+    //public static UnityEvent<uint> NetPlayerDisconnected = new UnityEvent<uint>();
+    public static UnityEvent<uint, bool> UpdatePlayerList = new UnityEvent<uint, bool>();
     public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
     public static UnityEvent<bool> UpdateHostBox = new UnityEvent<bool>();
     public static UnityEvent<string, bool> UpdateActiveRoleList = new UnityEvent<string, bool>();
+    public static UnityEvent SwitchingToGame = new UnityEvent();
 
     #endregion
 
@@ -41,7 +44,7 @@ public sealed class ClientNetEvents
             player = new NetWerewolfPlayer(pid, name);
             if (ServerInstance == null)
                 ConnectedPlayers.Add(player);
-            NetPlayerConnected.Invoke(player, false);
+            UpdatePlayerList.Invoke(player.PlayerID, false);
         }
         else
         {
@@ -61,8 +64,8 @@ public sealed class ClientNetEvents
             ConnectedPlayers.Remove(ConnectedPlayers.Find(p => p.PlayerID == pid));
 
         // TODO: GameInfo removal (Maybe make dead if alive, and then remove once spectator?)
-            
-        NetPlayerDisconnected.Invoke(pid);
+
+        UpdatePlayerList.Invoke(pid, true);
     }
 
     [NetDataEvent(5, ClientEventGroup)]
@@ -75,6 +78,14 @@ public sealed class ClientNetEvents
     static void ModifyActiveRoleList(UdpClient sender, string roleHash, bool remove)
     {
         UpdateActiveRoleList.Invoke(roleHash, remove);
+    }
+
+
+    [NetDataEvent(191, ClientEventGroup)]
+    static void ReceiveRoleAndSwitchScene(UdpClient sender, string roleHash)
+    {
+        LocalPlayer.Role = Activator.CreateInstance(GetRoleTypeFromHash(roleHash)) as WerewolfRole;
+        SwitchingToGame.Invoke();
     }
 
     [NetDataEvent(199, ClientEventGroup)]
@@ -100,7 +111,7 @@ public sealed class ClientNetEvents
             if (ServerInstance == null)
                 ConnectedPlayers.Add(netPlayer);
 
-            NetPlayerConnected.Invoke(netPlayer, LocalPlayer.PlayerID == playerIDs[i]);
+            UpdatePlayerList.Invoke(netPlayer.PlayerID, false);
         }
     }
 }
