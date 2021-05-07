@@ -30,4 +30,7 @@ public class GamePlayerButton : MonoBehaviour
 
     public void SetSelectable(bool canSelect) =>
         PlayerSelectorButton.interactable = canSelect;
+
+    public void PerformActionAgainst() =>
+        NetworkingGlobal.ClientInstance.Send(20, PlayerID);
 }

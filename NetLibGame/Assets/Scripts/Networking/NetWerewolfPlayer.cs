@@ -9,11 +9,14 @@ public class NetWerewolfPlayer : WerewolfPlayer
 {
     private UdpClient clientRef;
 
-    internal bool IsHost = false;
-    internal DateTime LastMessageTime = DateTime.MinValue;
-
+    public bool IsHost = false;
+    public DateTime LastMessageTime = DateTime.MinValue;
     public bool RoleListVerified = false;
     public string Name;
+
+    public uint TrialTargetPID = 0;
+    public int TrialVotes;
+    public bool VotedForKill;
 
     public bool HasVerified => RoleListVerified;
     public UdpClient PlayerClient => clientRef;

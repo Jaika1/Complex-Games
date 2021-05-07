@@ -24,6 +24,7 @@ public sealed class ClientNetEvents
     public static UnityEvent<bool> UpdateHostBox = new UnityEvent<bool>();
     public static UnityEvent<string, bool> UpdateActiveRoleList = new UnityEvent<string, bool>();
     public static UnityEvent SwitchingToGame = new UnityEvent();
+    public static UnityEvent<int> UpdateTimer = new UnityEvent<int>();
 
     #endregion
 
@@ -68,18 +69,25 @@ public sealed class ClientNetEvents
         UpdatePlayerList.Invoke(pid, true);
     }
 
+
     [NetDataEvent(5, ClientEventGroup)]
     static void ReceivedChatMessage(UdpClient client, uint pid, string message)
     {
         ChatMessageReceived.Invoke(ConnectedPlayers.Find(p => p.PlayerID == pid), message);
     }
 
+    [NetDataEvent(6, ClientEventGroup)]
+    static void SetTimerValue(UdpClient client, int time)
+    {
+        UpdateTimer.Invoke(time);
+    }
+
+
     [NetDataEvent(190, ClientEventGroup)]
     static void ModifyActiveRoleList(UdpClient sender, string roleHash, bool remove)
     {
         UpdateActiveRoleList.Invoke(roleHash, remove);
     }
-
 
     [NetDataEvent(191, ClientEventGroup)]
     static void ReceiveRoleAndSwitchScene(UdpClient sender, string roleHash)

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using WerewolfDataLib;
@@ -32,6 +34,7 @@ public static class NetworkingGlobal
     public static Dictionary<string, Type> LoadedRoleTypes;// = new Dictionary<string, Type>();
     public static List<string> LoadedRoleHashes;
     public static List<string> ActiveRoleHashes = new List<string>();
+    public static CancellationToken GameLoopCT;
 
     public static UdpServer ServerInstance => udpSv;
     public static UdpClient ClientInstance => udpCl;
@@ -153,6 +156,104 @@ public static class NetworkingGlobal
     public static UnityEngine.Color ToUnityColor(this System.Drawing.Color c)
     {
         return new UnityEngine.Color(c.R / 255.0f, c.G / 255.0f, c.B / 255.0f, c.A / 255.0f);
+    }
+
+    #endregion
+
+    #region Game Loop
+
+    public static GameState CurrentGameState;
+    public static int CurrentDay;
+    public static int StateTime;
+    public static bool StateChanged;
+
+    public static async Task NetGameLoop()
+    {
+        CurrentGameState = GameState.Discussion;
+        CurrentDay = 0;
+        StateTime = 25;
+        StateChanged = true;
+
+        while (true)
+        {
+            if (StateChanged)
+            {
+                foreach (NetWerewolfPlayer p in ConnectedPlayers)
+                {
+                    p.TrialTargetPID = 0u;
+                    p.TrialVotes = 0;
+                    p.VotedForKill = false;
+                }
+
+                switch (CurrentGameState)
+                {
+                    case GameState.Discussion:
+                        ServerInstance.Send(5, 0u, "Discussion has begun.");
+                        break;
+
+                    case GameState.Night:
+                        ServerInstance.Send(5, 0u, "The sun has retreated as the moon rises...");
+                        break;
+
+                    case GameState.Dawn:
+                        break;
+                }
+            }
+
+            StateChanged = false;
+
+            await Task.Delay(1000);
+            StateTime--;
+
+            if (StateTime < 0)
+            {
+                switch (CurrentGameState)
+                {
+                    case GameState.Discussion:
+                        CurrentGameState = GameState.Night;
+                        StateChanged = true;
+                        StateTime = 30;
+                        break;
+
+                    case GameState.Night:
+                        CurrentGameState = GameState.Dawn;
+                        StateChanged = true;
+                        StateTime = 10;
+                        CurrentDay++;
+                        break;
+
+                    case GameState.Dawn:
+                        CurrentGameState = GameState.Discussion;
+                        StateChanged = true;
+                        StateTime = 130;
+                        break;
+
+
+                    case GameState.Trial:
+                        // TODO: Straight to night if voted out
+                        CurrentGameState = GameState.Discussion;
+                        StateChanged = true;
+                        StateTime = 130;
+                        break;
+
+                    case GameState.End:
+                        // TODO: Reset the lobby
+                        StateTime = 999;
+                        break;
+                }
+            }
+
+            ServerInstance.Send(6, StateTime); // SetTimerValue(int);
+        }
+    }
+
+    public enum GameState : byte
+    {
+        Discussion,
+        Night,
+        Dawn,
+        Trial,
+        End
     }
 
     #endregion

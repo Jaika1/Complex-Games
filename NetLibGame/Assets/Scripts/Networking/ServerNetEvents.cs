@@ -4,7 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using WerewolfDataLib;
 using static NetworkingGlobal;
 
 public sealed class ServerNetEvents
@@ -133,6 +136,97 @@ public sealed class ServerNetEvents
         }
     }
 
+    [NetDataEvent(20, ServerEventGroup)]
+    static void RequestActionOnPlayer(UdpClient sender, uint pid)
+    {
+        NetWerewolfPlayer player = sender.GetPlayer();
+        NetWerewolfPlayer target = ConnectedPlayers.Find(p => p.PlayerID == pid);
+
+        if (player.Status != PlayerStatus.Alive)
+        {
+            switch (player.Status)
+            {
+                case PlayerStatus.Dead:
+                    sender.Send(5, 0u, $"You are dead and cannot perform any more actions!");
+                    return;
+                case PlayerStatus.Spectating:
+                    sender.Send(5, 0u, $"Spectators cannot perform in-game actions.");
+                    return;
+            }
+        }
+
+        if (target == null)
+        {
+            sender.Send(5, 0u, $"Targeted player with ID {pid} not found.");
+            return;
+        }
+
+        if (CurrentDay == 0 && CurrentGameState == GameState.Discussion)
+        {
+            sender.Send(5, 0u, $"No votes for execution will be considered until the first night is over!");
+            return;
+        }
+
+        switch (CurrentGameState)
+        {
+            case GameState.Dawn:
+                sender.Send(5, 0u, $"Please wait until dawn is over to begin voting.");
+                break;
+
+            case GameState.Discussion:
+                // TODO: Vote against player
+                if (target.PlayerID == player.PlayerID)
+                {
+                    sender.Send(5, 0u, $"You cannot vote yourself onto trial!");
+                    break;
+                }
+
+                if (player.TrialTargetPID != target.PlayerID)
+                {
+                    player.TrialTargetPID = target.PlayerID;
+                    target.TrialVotes++;
+                    ServerInstance.Send(5, 0u, $"{player.Name} has voted to trial {target.Name}! ({target.TrialVotes}/2)");
+
+                    if (target.TrialVotes >= 2)
+                    {
+                        CurrentGameState = GameState.Trial;
+                        StateChanged = true;
+                        StateTime = 20;
+                    }
+                }
+
+                else if (player.TrialTargetPID == target.PlayerID)
+                {
+                    player.TrialTargetPID = 0u;
+                    target.TrialVotes--;
+                    ServerInstance.Send(5, 0u, $"{player.Name} has revoked their vote to trial {target.Name}. ({target.TrialVotes}/2)");
+                }
+
+                break;
+
+            case GameState.Night:
+                // TODO: Night abilities
+                if (player.Role.NightEvent == null)
+                {
+                    sender.Send(5, 0u, $"The {player.Role.Name} role does not have a night ability!");
+                    break;
+                }
+
+                if (player.Role.NightEvent.EventTargets == 0)
+                {
+                    sender.Send(5, 0u, $"Your night ability is passive and does not require a target.");
+                    break;
+                }
+
+                sender.Send(5, 0u, $"You have decided to target {target.Name}."); // TODO: custom action text
+                break;
+
+            case GameState.End:
+                sender.Send(5, 0u, $"The game is already over!");
+                break;
+        }
+    }
+
     [NetDataEvent(190, ServerEventGroup)]
     static void ModifyActiveRoleList(UdpClient sender, string roleHash, bool remove)
     {
@@ -172,10 +266,6 @@ public sealed class ServerNetEvents
             return;
         }
 
-        sender.Send(5, 0u, "Start conditions met, game would begin now!");
-
-        // TODO: go to game scene
-
         List<Type> roleTypes = (from h in ActiveRoleHashes
                                 from t in LoadedRoleTypes.Values
                                 let th = GetRoleHashFromType(t)
@@ -186,5 +276,8 @@ public sealed class ServerNetEvents
 
         foreach (NetWerewolfPlayer p in ConnectedPlayers)
             p.PlayerClient.Send(191, GetRoleHashFromType(p.Role.GetType()));
+
+        GameLoopCT = new CancellationToken(false);
+        _ = Task.Run(NetGameLoop, GameLoopCT);
     }
 }

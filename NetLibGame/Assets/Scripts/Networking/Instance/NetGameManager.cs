@@ -12,6 +12,7 @@ public class NetGameManager : MonoBehaviour
     public TMP_Text ChatTextField;
     public TMP_InputField ChatBoxInputField;
     public Transform PlayerListContentTransform;
+    public TMP_Text TimerText;
 
     [Header("UI Prefabs")]
     public GamePlayerButton GamePlayerPrefab;
@@ -23,6 +24,7 @@ public class NetGameManager : MonoBehaviour
     {
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
         ClientNetEvents.UpdatePlayerList.AddListener(PlayerListUpdated);
+        ClientNetEvents.UpdateTimer.AddListener(UpdateTimer);
 
         ChatBoxInputField.onSubmit.AddListener(SendChatMessage);
 
@@ -77,5 +79,12 @@ public class NetGameManager : MonoBehaviour
         ChatBoxInputField.text = string.Empty;
         ChatBoxInputField.Select();
         ChatBoxInputField.ActivateInputField();
+    }
+
+    public void UpdateTimer(int timeSeconds)
+    {
+        InvokerObj.Invoke(() => {
+            TimerText.SetText(TimeSpan.FromSeconds(timeSeconds).ToString(@"m\:ss"));
+        });
     }
 }
