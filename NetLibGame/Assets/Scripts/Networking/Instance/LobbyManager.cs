@@ -37,7 +37,7 @@ public class LobbyManager : MonoBehaviour
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
         ClientNetEvents.UpdateHostBox.AddListener(UpdateHostBox);
         ClientNetEvents.UpdateActiveRoleList.AddListener(UpdateActiveRoleList);
-        ClientNetEvents.SwitchingToGame.AddListener(Switching);
+        ClientNetEvents.FlipGameScene.AddListener(Switching);
 
         ChatBoxInputField.onSubmit.AddListener(SendChatMessage);
 
@@ -45,10 +45,19 @@ public class LobbyManager : MonoBehaviour
         {
             NetworkingGlobal.FirstLobby = false;
 
-            if (NetworkingGlobal.ServerInstance != null)
-                NetworkingGlobal.InitializeClientInstance(IPAddress.Loopback, 7235);
-            else
-                NetworkingGlobal.InitializeClientInstance(NetworkingGlobal.ClientConnectIP, NetworkingGlobal.ClientConnectPort);
+            if (!(NetworkingGlobal.ServerInstance != null ? 
+                    NetworkingGlobal.InitializeClientInstance(IPAddress.Loopback, 7235) : 
+                    NetworkingGlobal.InitializeClientInstance(NetworkingGlobal.ClientConnectIP, NetworkingGlobal.ClientConnectPort)))
+            {
+                InvokerObj.Instance.ShowError("The client failed to connect to the server. Please make sure you're using the correct IP address and port and that your setup isn't busted, then try again.");
+            }
+        }
+        else
+        {
+            foreach(NetWerewolfPlayer p in NetworkingGlobal.ConnectedPlayers)
+            {
+                PlayerListUpdated(p.PlayerID, false);
+            }
         }
 
         foreach(string rHash in NetworkingGlobal.LoadedRoleHashes)
@@ -70,7 +79,7 @@ public class LobbyManager : MonoBehaviour
             ClientNetEvents.ChatMessageReceived.RemoveListener(WriteChatMessage);
             ClientNetEvents.UpdateHostBox.RemoveListener(UpdateHostBox);
             ClientNetEvents.UpdateActiveRoleList.RemoveListener(UpdateActiveRoleList);
-            ClientNetEvents.SwitchingToGame.RemoveListener(Switching);
+            ClientNetEvents.FlipGameScene.RemoveListener(Switching);
 
             SceneManager.LoadScene("GameScene");
         });
@@ -181,5 +190,15 @@ public class LobbyManager : MonoBehaviour
     public void SendTryStartGame()
     {
         NetworkingGlobal.ClientInstance.Send(191);
+    }
+
+    public void QuitToMenu()
+    {
+        NetworkingGlobal.FirstLobby = true;
+        NetworkingGlobal.ActiveRoleHashes = new List<string>();
+        NetworkingGlobal.CloseClientInstance();
+        NetworkingGlobal.CloseServerInstance();
+
+        SceneManager.LoadScene("TitleScreen");
     }
 }

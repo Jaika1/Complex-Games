@@ -10,7 +10,7 @@ namespace WerewolfDataLib
         public abstract string Name { get; }
         public abstract string Description { get; }
 
-        public IRoleAlignment Alignment;
-        public NightEvent NightEvent;
+        public abstract IRoleAlignment Alignment { get; }
+        public NightEvent NightEvent = null;
     }
 }

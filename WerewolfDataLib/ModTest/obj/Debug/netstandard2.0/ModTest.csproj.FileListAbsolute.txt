@@ -1,0 +1,11 @@
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\bin\Debug\netstandard2.0\ModTest.deps.json
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\bin\Debug\netstandard2.0\ModTest.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\bin\Debug\netstandard2.0\ModTest.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\bin\Debug\netstandard2.0\WerewolfDataLib.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\bin\Debug\netstandard2.0\WerewolfDataLib.pdb
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.csprojAssemblyReference.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.AssemblyInfoInputs.cache
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.AssemblyInfo.cs
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.csproj.CopyComplete
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.dll
+C:\Users\s200099\Documents\Complex-Games\WerewolfDataLib\ModTest\obj\Debug\netstandard2.0\ModTest.pdb

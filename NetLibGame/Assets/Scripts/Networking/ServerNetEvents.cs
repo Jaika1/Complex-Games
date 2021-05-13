@@ -13,7 +13,7 @@ using static NetworkingGlobal;
 public sealed class ServerNetEvents
 {
     static System.Random rand = new System.Random();
-    const int MIN_PLAYERS = 2;
+    const int MIN_PLAYERS = 4;
 
     #region Event handlers
 
@@ -26,6 +26,7 @@ public sealed class ServerNetEvents
     public static void ClientDisconnectedEventHandler(UdpClient client)
     {
         NetWerewolfPlayer player = client.GetPlayer();
+        player.Status = PlayerStatus.Dead;
         ServerInstance.Send(2, player.PlayerID); // RemoteClientDisconnected(uint)
         ServerInstance.Send(5, 0u, $"{player.Name} has fallen...");
 
@@ -142,17 +143,14 @@ public sealed class ServerNetEvents
         NetWerewolfPlayer player = sender.GetPlayer();
         NetWerewolfPlayer target = ConnectedPlayers.Find(p => p.PlayerID == pid);
 
-        if (player.Status != PlayerStatus.Alive)
+        switch (player.Status)
         {
-            switch (player.Status)
-            {
-                case PlayerStatus.Dead:
-                    sender.Send(5, 0u, $"You are dead and cannot perform any more actions!");
-                    return;
-                case PlayerStatus.Spectating:
-                    sender.Send(5, 0u, $"Spectators cannot perform in-game actions.");
-                    return;
-            }
+            case PlayerStatus.Dead:
+                sender.Send(5, 0u, $"You are dead and cannot perform any more actions!");
+                return;
+            case PlayerStatus.Spectating:
+                sender.Send(5, 0u, $"Spectators cannot perform in-game actions.");
+                return;
         }
 
         if (target == null)
@@ -187,8 +185,9 @@ public sealed class ServerNetEvents
                     target.TrialVotes++;
                     ServerInstance.Send(5, 0u, $"{player.Name} has voted to trial {target.Name}! ({target.TrialVotes}/2)");
 
-                    if (target.TrialVotes >= 2)
+                    if (target.TrialVotes >= 2 && PlayerOnTrial == null)
                     {
+                        PlayerOnTrial = target;
                         CurrentGameState = GameState.Trial;
                         StateChanged = true;
                         StateTime = 20;
@@ -202,6 +201,28 @@ public sealed class ServerNetEvents
                     ServerInstance.Send(5, 0u, $"{player.Name} has revoked their vote to trial {target.Name}. ({target.TrialVotes}/2)");
                 }
 
+                break;
+
+            case GameState.Trial:
+                if (PlayerOnTrial != null && PlayerOnTrial.Status != PlayerStatus.Dead)
+                {
+                    if (player.PlayerID == PlayerOnTrial.PlayerID)
+                    {
+                        sender.Send(5, 0u, $"You are on trial and cannot vote to execute yourself!");
+                        break;
+                    }
+
+                    player.VotedForKill = !player.VotedForKill;
+
+                    if (player.VotedForKill)
+                        sender.Send(5, 0u, $"You have voted to kill {PlayerOnTrial.Name}.");
+                    else
+                        sender.Send(5, 0u, $"You have decided to revoke your vote to kill {PlayerOnTrial.Name}.");
+                }
+                else
+                {
+                    sender.Send(5, 0u, $"The player who was on trial can no longer be voted against.");
+                }
                 break;
 
             case GameState.Night:
@@ -218,7 +239,17 @@ public sealed class ServerNetEvents
                     break;
                 }
 
-                sender.Send(5, 0u, $"You have decided to target {target.Name}."); // TODO: custom action text
+                if (player.Role.NightEvent.TargetPlayers[0] == null || player.Role.NightEvent.TargetPlayers[0].PlayerID != target.PlayerID)
+                {
+                    player.Role.NightEvent.TargetPlayers[0] = target;
+                    sender.Send(5, 0u, $"You have decided to target {target.Name}."); // TODO: custom action text
+                }
+                else
+                {
+                    player.Role.NightEvent.TargetPlayers[0] = null;
+                    sender.Send(5, 0u, $"You have instead decided not to perform your night ability.");
+                }
+
                 break;
 
             case GameState.End:

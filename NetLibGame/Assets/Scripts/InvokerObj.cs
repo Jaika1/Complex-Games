@@ -4,15 +4,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InvokerObj : MonoBehaviour
 {
     public static List<Invokee> ToInvoke = new List<Invokee>();
+    private static InvokerObj instance;
 
+    [Header("Debug UI")]
     public GameObject DebugCanvasRef;
     public Text DebugTextRef;
+
+    [Header("Error UI")]
+    public GameObject ErrorCanvasRef;
+    public TMP_Text ErrorReasonText;
+
+    public static InvokerObj Instance => instance;
+
 
     private void Start()
     {
@@ -21,6 +32,7 @@ public class InvokerObj : MonoBehaviour
         else
         {
             DontDestroyOnLoad(this);
+            instance = this;
 #if !UNITY_EDITOR
             Destroy(DebugCanvasRef);
 #else
@@ -28,6 +40,9 @@ public class InvokerObj : MonoBehaviour
 #endif
             Application.wantsToQuit += Application_quitting;
         }
+
+        ErrorReasonText.autoSizeTextContainer = true;
+        ErrorCanvasRef.SetActive(false);
     }
 
     private bool Application_quitting()
@@ -58,6 +73,25 @@ public class InvokerObj : MonoBehaviour
         GUIUtility.systemCopyBuffer = DebugTextRef.text;
     }
 
+    public void ShowError(string reason)
+    {
+        ErrorReasonText.SetText(reason);
+        ErrorCanvasRef.SetActive(true);
+    }
+
+    public void CloseErrorCanvas()
+    {
+        ErrorCanvasRef.SetActive(false);
+
+        NetworkingGlobal.FirstLobby = true;
+        NetworkingGlobal.ActiveRoleHashes = new List<string>();
+        NetworkingGlobal.CloseClientInstance();
+        NetworkingGlobal.CloseServerInstance();
+
+        if (SceneManager.GetActiveScene().name != "TitleScreen")
+            SceneManager.LoadScene("TitleScreen");
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -79,6 +113,7 @@ public class InvokerObj : MonoBehaviour
     {
         return (TOut)~new Invokee(f.Target, f.Method, true);
     }
+
 }
 
 public sealed class Invokee

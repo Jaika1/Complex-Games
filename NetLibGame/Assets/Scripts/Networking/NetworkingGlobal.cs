@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using WerewolfDataLib;
+using WerewolfDataLib.Interfaces;
 
 #if UNITY_EDITOR
 [InitializeOnLoad]
@@ -17,6 +19,8 @@ using WerewolfDataLib;
 public static class NetworkingGlobal
 {
     private const uint SharedSecret = 0x1A7D2F9Bu;
+    private static string modsDirectory = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\My Games\Jaika1\Werewolf\Mods\";
+    private static List<Assembly> modAsms = new List<Assembly>();
 
     private static UdpServer udpSv;
     private static UdpClient udpCl;
@@ -26,7 +30,6 @@ public static class NetworkingGlobal
     public const int ClientEventGroup = 0;
     public const int ServerEventGroup = 1;
 
-    public static string PlayerName = $"Player{UnityEngine.Random.Range(1000,9999)}";
     public static NetWerewolfPlayer LocalPlayer;
     public static bool FirstLobby = true;
     public static IPAddress ClientConnectIP;
@@ -44,9 +47,33 @@ public static class NetworkingGlobal
 
     static NetworkingGlobal()
     {
+        PlayerSettings.LoadConfig();
+
         // We must shut down the server and/or client when the editor stops, since that doesn't happen automatically for us.
         Application.wantsToQuit += Application_quitting;
-        LoadedRoleTypes = WerewolfGameInfo.LoadRolesFromAssemblies(Assembly.GetExecutingAssembly());
+        LoadAllRoles();
+    }
+
+    private static void LoadAllRoles()
+    {
+        List<Assembly> roleAsms = new List<Assembly>();
+        roleAsms.Add(Assembly.GetExecutingAssembly()); // This assembly to load the internal roles.
+
+        if (Directory.Exists(modsDirectory))
+        {
+            foreach (string dll in Directory.EnumerateFiles(modsDirectory, "*.dll"))
+            {
+                Assembly modAsm = Assembly.LoadFrom(dll);
+                roleAsms.Add(modAsm);
+                modAsms.Add(modAsm);
+            }
+        }
+        else
+        {
+            Directory.CreateDirectory(modsDirectory);
+        }
+
+        LoadedRoleTypes = WerewolfGameInfo.LoadRolesFromAssemblies(roleAsms.ToArray());
         LoadedRoleHashes = WerewolfGameInfo.GenerateRoleHashes(LoadedRoleTypes.Values.ToArray());
     }
 
@@ -57,7 +84,7 @@ public static class NetworkingGlobal
         return true;
     }
 
-    public static void InitializeServerInstance()
+    public static bool InitializeServerInstance()
     {
         gameInfo = new WerewolfGameInfo(LoadedRoleTypes);
         players = new List<NetWerewolfPlayer>();
@@ -65,18 +92,18 @@ public static class NetworkingGlobal
         udpSv.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ServerEventGroup);
         udpSv.ClientConnected += ServerNetEvents.ClientConnectedEventHandler;
         udpSv.ClientDisconnected += ServerNetEvents.ClientDisconnectedEventHandler;
-        udpSv.StartServer(7235);
+        return udpSv.StartServer(7235);
     }
 
-    public static void InitializeClientInstance(IPAddress ip, int port)
+    public static bool InitializeClientInstance(IPAddress ip, int port)
     {
         if (udpSv == null)
             players = new List<NetWerewolfPlayer>();
         udpCl = new UdpClient(SharedSecret);
-        LocalPlayer = new NetWerewolfPlayer(udpCl, PlayerName);
+        LocalPlayer = new NetWerewolfPlayer(udpCl, PlayerSettings.Instance.PlayerName);
         udpCl.AddNetEventsFromAssembly(Assembly.GetExecutingAssembly(), ClientEventGroup);
         udpCl.ClientDisconnected += ClientNetEvents.ClientDisconnectedEventHandler;
-        bool success = udpCl.VerifyAndListen(ip, port);
+        return udpCl.VerifyAndListen(ip, port);
     }
 
     public static void CloseServerInstance()
@@ -166,6 +193,8 @@ public static class NetworkingGlobal
     public static int CurrentDay;
     public static int StateTime;
     public static bool StateChanged;
+    public static NetWerewolfPlayer PlayerOnTrial;
+    public static IRoleAlignment[] WinningAlignments = null;
 
     public static async Task NetGameLoop()
     {
@@ -173,6 +202,7 @@ public static class NetworkingGlobal
         CurrentDay = 0;
         StateTime = 25;
         StateChanged = true;
+        PlayerOnTrial = null;
 
         while (true)
         {
@@ -196,6 +226,24 @@ public static class NetworkingGlobal
                         break;
 
                     case GameState.Dawn:
+                        List<NetWerewolfPlayer> affectedPlayers = GameInfo.ResolveNightEvents().ConvertAll(p => p as NetWerewolfPlayer);
+                        affectedPlayers.ForEach(p =>
+                        {
+                            ServerInstance.Send(50, p.PlayerID, p.Status); // UpdatePlayerStatus(UdpClient, uint, PlayerStatus)
+                            ServerInstance.Send(5, 0u, $"{p.Name} is {p.Status}!{(p.Status == PlayerStatus.Dead ? $" Their role was {p.Role.Name}" : "")}");
+                        });
+                        break;
+
+                    case GameState.Trial:
+                        if (PlayerOnTrial != null)
+                        {
+                            ServerInstance.Send(5, 0u, $"The town has decided to trial {PlayerOnTrial.Name}! Select their name to vote them guilty.");
+                        }
+                        else StateTime = 0;
+                        break;
+
+                    case GameState.End:
+                        ServerInstance.Send(5, 0u, $"The following players have won: {string.Join(", ", ConnectedPlayers.Where(p => WinningAlignments.Contains(p.Role.Alignment)).Select(p => p.Name))}");
                         break;
                 }
             }
@@ -211,36 +259,81 @@ public static class NetworkingGlobal
                 {
                     case GameState.Discussion:
                         CurrentGameState = GameState.Night;
-                        StateChanged = true;
-                        StateTime = 30;
+                        StateTime = 15;
                         break;
 
                     case GameState.Night:
                         CurrentGameState = GameState.Dawn;
-                        StateChanged = true;
                         StateTime = 10;
                         CurrentDay++;
                         break;
 
                     case GameState.Dawn:
+                        (bool End, IRoleAlignment[] WinList) result = GameInfo.CheckIfWinConditionMet();
+
+                        if (result.End)
+                        {
+                            WinningAlignments = result.WinList;
+                            CurrentGameState = GameState.End;
+                            StateTime = 20;
+                            break;
+                        }
+
                         CurrentGameState = GameState.Discussion;
-                        StateChanged = true;
-                        StateTime = 130;
+                        StateTime = 120;
                         break;
 
 
                     case GameState.Trial:
                         // TODO: Straight to night if voted out
+                        if (PlayerOnTrial != null && PlayerOnTrial.Status != PlayerStatus.Dead)
+                        {
+                            int votes = players.Count(p => p.VotedForKill);
+                            int voters = players.Count(p => p.PlayerID != PlayerOnTrial.PlayerID && p.Status == PlayerStatus.Alive);
+
+                            if (votes >= Mathf.CeilToInt(voters / 2.0f))
+                            {
+                                PlayerOnTrial.Status = PlayerStatus.Dead;
+                                ServerInstance.Send(50, PlayerOnTrial.PlayerID, PlayerOnTrial.Status); // UpdatePlayerStatus(uint, PlayerStatus)
+                                ServerInstance.Send(5, 0u, $"The town has decided to execute {PlayerOnTrial.Name}! They were a {PlayerOnTrial.Role.Name}!");
+
+                                (bool End, IRoleAlignment[] WinList) trialResult = GameInfo.CheckIfWinConditionMet();
+
+                                if (trialResult.End)
+                                {
+                                    WinningAlignments = trialResult.WinList;
+                                    CurrentGameState = GameState.End;
+                                    StateTime = 20;
+                                    break;
+                                }
+
+                                CurrentGameState = GameState.Night;
+                                StateTime = 15;
+
+                                break;
+                            }
+                        }
+
                         CurrentGameState = GameState.Discussion;
-                        StateChanged = true;
-                        StateTime = 130;
+                        StateTime = 50;
                         break;
 
                     case GameState.End:
                         // TODO: Reset the lobby
-                        StateTime = 999;
-                        break;
+
+                        ConnectedPlayers.ForEach(p => {
+                            p.Status = PlayerStatus.Spectating;
+                            p.Role = null;
+                        });
+
+                        ActiveRoleHashes = new List<string>();
+                        PlayerOnTrial = null;
+
+                        ServerInstance.Send(192); // InvokeSceneFlip();
+                        return;
                 }
+                StateChanged = true;
+                PlayerOnTrial = null;
             }
 
             ServerInstance.Send(6, StateTime); // SetTimerValue(int);

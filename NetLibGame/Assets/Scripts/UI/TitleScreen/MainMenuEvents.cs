@@ -18,7 +18,11 @@ public class MainMenuEvents : MonoBehaviour
     public void HostGame()
     {
         NetworkingGlobal.FirstLobby = true;
-        NetworkingGlobal.InitializeServerInstance();
+        if (!NetworkingGlobal.InitializeServerInstance())
+        {
+            InvokerObj.Instance.ShowError("Failed to start the server! Please make sure you have a valid network adapter availiable to bind to, and that no other programs have bound to it! (Using port 7235 UDP)");
+            return;
+        }
         SceneManager.LoadScene("LobbyScene");
     }
 
@@ -33,15 +37,22 @@ public class MainMenuEvents : MonoBehaviour
             }
             catch
             {
+                InvokerObj.Instance.ShowError("Could not parse the given IP address! Please note that at this time, the program is only able to resolve raw IPv4 addresses.");
                 return;
             }
         }
 
         if (!int.TryParse(PortInputField.text, out NetworkingGlobal.ClientConnectPort))
+        {
+            InvokerObj.Instance.ShowError("Could not parse the given port! A valid port should be a number within' the range of 0-65535.");
             return;
+        }
 
         if (NetworkingGlobal.ClientConnectPort < 0 || NetworkingGlobal.ClientConnectPort > 65535)
+        {
+            InvokerObj.Instance.ShowError("Port out of range! A valid port should be a number within' the range of 0-65535.");
             return;
+        }
 
         NetworkingGlobal.FirstLobby = true;
         SceneManager.LoadScene("LobbyScene");

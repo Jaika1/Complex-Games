@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TestWerewolfRoles\TestWerewolfRoles.csproj" />
     <ProjectReference Include="..\WerewolfDataLib\WerewolfDataLib.csproj" />
   </ItemGroup>
 

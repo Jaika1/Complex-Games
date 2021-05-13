@@ -99,22 +99,43 @@ namespace WerewolfDataLib
                 predeterminedTypesClone.RemoveAt(roleIndex);
 
                 playingGroup[i].Role = (WerewolfRole)Activator.CreateInstance(playerRoleType);
+                if (playingGroup[i].Role.NightEvent != null)
+                    playingGroup[i].Role.NightEvent.SourcePlayer = playingGroup[i];
             }
         }
 
-        public List<WerewolfPlayer> ResolveNightEvents(List<NightEvent> events)
+        public List<WerewolfPlayer> ResolveNightEvents(/*List<NightEvent> events*/)
         {
+            List<NightEvent> events = (from p in Players
+                                       where p.Status == PlayerStatus.Alive
+                                       where p.Role.NightEvent != null
+                                       select p.Role.NightEvent).ToList();
+
             List<WerewolfPlayer> eventPlayers = new List<WerewolfPlayer>();
             events.Sort((e1, e2) => e1.EventPriority.CompareTo(e2.EventPriority));
 
-            events.ForEach(e => e?.DoNightEvent(this));
+            events.ForEach(e => eventPlayers.AddRange(e?.DoNightEvent(this)));
 
             return eventPlayers;
         }
 
         public (bool, IRoleAlignment[]) CheckIfWinConditionMet()
         {
-            return (false, null);
+            List<IRoleAlignment> winAlignments = new List<IRoleAlignment>();
+
+            foreach (WerewolfPlayer p in Players)
+            {
+                if (p.Status == PlayerStatus.Alive && !winAlignments.Contains(p.Role.Alignment))
+                {
+                    if (p.Role.Alignment.CheckWinCondition(this, Players.Where(wp => wp.Status == PlayerStatus.Alive).ToArray()))
+                        winAlignments.Add(p.Role.Alignment);
+                }
+            }
+
+            if (winAlignments.Count == 0)
+                return (false, null);
+
+            return (true, winAlignments.ToArray());
         }
     }
 }

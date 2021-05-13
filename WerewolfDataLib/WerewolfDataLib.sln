@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WerewolfDataLib", "WerewolfDataLib\WerewolfDataLib.csproj", "{5B53DCD3-1AB1-4CE3-8C52-DF63E93D64A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WerewolfLogicDemo", "WerewolfLogicDemo\WerewolfLogicDemo.csproj", "{D1FF037F-740C-4351-86E2-1424E3C9077E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WerewolfLogicDemo", "WerewolfLogicDemo\WerewolfLogicDemo.csproj", "{D1FF037F-740C-4351-86E2-1424E3C9077E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWerewolfRoles", "TestWerewolfRoles\TestWerewolfRoles.csproj", "{9140B7BE-9674-49FF-83C9-C2108BB12CA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModTest", "ModTest\ModTest.csproj", "{FCFCCF2C-8B55-4908-8A37-607F5EA905DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{D1FF037F-740C-4351-86E2-1424E3C9077E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1FF037F-740C-4351-86E2-1424E3C9077E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1FF037F-740C-4351-86E2-1424E3C9077E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9140B7BE-9674-49FF-83C9-C2108BB12CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9140B7BE-9674-49FF-83C9-C2108BB12CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9140B7BE-9674-49FF-83C9-C2108BB12CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9140B7BE-9674-49FF-83C9-C2108BB12CA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCFCCF2C-8B55-4908-8A37-607F5EA905DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCFCCF2C-8B55-4908-8A37-607F5EA905DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCFCCF2C-8B55-4908-8A37-607F5EA905DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCFCCF2C-8B55-4908-8A37-607F5EA905DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetGameManager : MonoBehaviour
@@ -25,6 +26,7 @@ public class NetGameManager : MonoBehaviour
         ClientNetEvents.ChatMessageReceived.AddListener(WriteChatMessage);
         ClientNetEvents.UpdatePlayerList.AddListener(PlayerListUpdated);
         ClientNetEvents.UpdateTimer.AddListener(UpdateTimer);
+        ClientNetEvents.FlipGameScene.AddListener(BackToLobby);
 
         ChatBoxInputField.onSubmit.AddListener(SendChatMessage);
 
@@ -32,9 +34,9 @@ public class NetGameManager : MonoBehaviour
             PlayerListUpdated(NetworkingGlobal.ConnectedPlayers[i].PlayerID, false);
     }
 
-    private void PlayerListUpdated(uint pid, bool remove)
+    private void PlayerListUpdated(uint pid, bool dead)
     {
-        if (remove)
+        if (dead)
         {
             GamePlayerButton pan = playerPanels.Find(p => p.PlayerID == pid);
             
@@ -85,6 +87,19 @@ public class NetGameManager : MonoBehaviour
     {
         InvokerObj.Invoke(() => {
             TimerText.SetText(TimeSpan.FromSeconds(timeSeconds).ToString(@"m\:ss"));
+        });
+    }
+
+    private void BackToLobby()
+    {
+        ClientNetEvents.ChatMessageReceived.RemoveListener(WriteChatMessage);
+        ClientNetEvents.UpdatePlayerList.RemoveListener(PlayerListUpdated);
+        ClientNetEvents.UpdateTimer.RemoveListener(UpdateTimer);
+        ClientNetEvents.FlipGameScene.RemoveListener(BackToLobby);
+
+        InvokerObj.Invoke(() =>
+        {
+            SceneManager.LoadScene("LobbyScene");
         });
     }
 }

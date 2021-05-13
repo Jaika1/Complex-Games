@@ -2,10 +2,14 @@
 {
     public abstract class NightEvent
     {
+        public NightEvent()
+            => TargetPlayers = new WerewolfPlayer[EventTargets];
+
+        internal WerewolfPlayer SourcePlayer = null;
+        public WerewolfPlayer[] TargetPlayers;
+
         public abstract uint EventPriority { get; }
-        public WerewolfPlayer SourcePlayer = null;
         public abstract byte EventTargets { get; }
-        public WerewolfPlayer[] TargetPlayers = new WerewolfPlayer[0];
 
         public abstract WerewolfPlayer[] DoNightEvent(WerewolfGameInfo gameNfo);
     }

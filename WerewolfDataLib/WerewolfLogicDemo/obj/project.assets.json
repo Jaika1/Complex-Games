@@ -2,19 +2,6 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "TestWerewolfRoles/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v3.1",
-        "dependencies": {
-          "WerewolfDataLib": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/TestWerewolfRoles.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/TestWerewolfRoles.dll": {}
-        }
-      },
       "WerewolfDataLib/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -28,11 +15,6 @@
     }
   },
   "libraries": {
-    "TestWerewolfRoles/1.0.0": {
-      "type": "project",
-      "path": "../TestWerewolfRoles/TestWerewolfRoles.csproj",
-      "msbuildProject": "../TestWerewolfRoles/TestWerewolfRoles.csproj"
-    },
     "WerewolfDataLib/1.0.0": {
       "type": "project",
       "path": "../WerewolfDataLib/WerewolfDataLib.csproj",
@@ -41,7 +23,6 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "TestWerewolfRoles >= 1.0.0",
       "WerewolfDataLib >= 1.0.0"
     ]
   },
@@ -71,9 +52,6 @@
       "frameworks": {
         "netcoreapp3.1": {
           "projectReferences": {
-            "C:\\Users\\s200099\\Documents\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj": {
-              "projectPath": "C:\\Users\\s200099\\Documents\\Complex-Games\\WerewolfDataLib\\TestWerewolfRoles\\TestWerewolfRoles.csproj"
-            },
             "C:\\Users\\s200099\\Documents\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj": {
               "projectPath": "C:\\Users\\s200099\\Documents\\Complex-Games\\WerewolfDataLib\\WerewolfDataLib\\WerewolfDataLib.csproj"
             }

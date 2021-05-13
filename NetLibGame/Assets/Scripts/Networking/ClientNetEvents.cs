@@ -23,7 +23,7 @@ public sealed class ClientNetEvents
     public static UnityEvent<NetWerewolfPlayer, string> ChatMessageReceived = new UnityEvent<NetWerewolfPlayer, string>();
     public static UnityEvent<bool> UpdateHostBox = new UnityEvent<bool>();
     public static UnityEvent<string, bool> UpdateActiveRoleList = new UnityEvent<string, bool>();
-    public static UnityEvent SwitchingToGame = new UnityEvent();
+    public static UnityEvent FlipGameScene = new UnityEvent();
     public static UnityEvent<int> UpdateTimer = new UnityEvent<int>();
 
     #endregion
@@ -83,6 +83,15 @@ public sealed class ClientNetEvents
     }
 
 
+    [NetDataEvent(50, ClientEventGroup)]
+    static void UpdatePlayerStatus(UdpClient client, uint pid, PlayerStatus status)
+    {
+        NetWerewolfPlayer ap = ConnectedPlayers.Find(p => p.PlayerID == pid);
+        ap.Status = status;
+        UpdatePlayerList.Invoke(pid, status == PlayerStatus.Dead);
+    }
+
+
     [NetDataEvent(190, ClientEventGroup)]
     static void ModifyActiveRoleList(UdpClient sender, string roleHash, bool remove)
     {
@@ -93,7 +102,13 @@ public sealed class ClientNetEvents
     static void ReceiveRoleAndSwitchScene(UdpClient sender, string roleHash)
     {
         LocalPlayer.Role = Activator.CreateInstance(GetRoleTypeFromHash(roleHash)) as WerewolfRole;
-        SwitchingToGame.Invoke();
+        FlipGameScene.Invoke();
+    }
+
+    [NetDataEvent(192, ClientEventGroup)]
+    static void InvokeSceneFlip(UdpClient sender)
+    {
+        FlipGameScene.Invoke();
     }
 
     [NetDataEvent(199, ClientEventGroup)]

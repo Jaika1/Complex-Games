@@ -15,7 +15,7 @@ public class SettingsManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerNameField.text = NetworkingGlobal.PlayerName;
+        PlayerNameField.text = PlayerSettings.Instance.PlayerName;
         PlayerNameField.onValueChanged.AddListener(PlayerNameChanged);
 
         string rolesTxt = "";
@@ -28,17 +28,18 @@ public class SettingsManager : MonoBehaviour
 
         WindowModeDropdown.value = (int)Screen.fullScreenMode;
         WindowModeDropdown.onValueChanged.AddListener(ChangeFullscreenMode);
-
-
     }
 
     private void PlayerNameChanged(string newName)
     {
-        NetworkingGlobal.PlayerName = newName;
+        PlayerSettings.Instance.PlayerName = newName;
     }
 
     public void ChangeFullscreenMode(int mode)
     {
         Screen.fullScreenMode = (FullScreenMode)mode;
     }
+
+    public void SaveSettings()
+        => PlayerSettings.Instance.SaveConfig();
 }
