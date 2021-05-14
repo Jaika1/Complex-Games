@@ -24,16 +24,16 @@ public class PlayerSettings
         else
         {
             instance = new PlayerSettings();
-            instance.SaveConfig();
+            SaveConfig();
         }
     }
 
-    public void SaveConfig()
+    public static void SaveConfig()
     {
         if (!Directory.Exists(SaveLocation))
             Directory.CreateDirectory(SaveLocation);
 
-        File.WriteAllText(FullPath, JsonUtility.ToJson(this, true));
+        File.WriteAllText(FullPath, JsonUtility.ToJson(instance, true));
     }
 
     // ACTUAL FIELDS

@@ -15,18 +15,11 @@ public class SettingsManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerNameField.text = PlayerSettings.Instance.PlayerName;
-        PlayerNameField.onValueChanged.AddListener(PlayerNameChanged);
-
-        string rolesTxt = "";
-        for(int i = 0; i < NetworkingGlobal.LoadedRoleTypes.Count; ++i)
-        {
-            rolesTxt += $"[{NetworkingGlobal.LoadedRoleHashes[i]}] {NetworkingGlobal.LoadedRoleTypes.Keys.ElementAt(i)} ({NetworkingGlobal.LoadedRoleTypes.Values.ElementAt(i).AssemblyQualifiedName}){Environment.NewLine}";
-        }
         LoadedRolesText.autoSizeTextContainer = true;
-        LoadedRolesText.SetText(rolesTxt);
 
-        WindowModeDropdown.value = (int)Screen.fullScreenMode;
+        UpdateSettingsView();
+
+        PlayerNameField.onValueChanged.AddListener(PlayerNameChanged);
         WindowModeDropdown.onValueChanged.AddListener(ChangeFullscreenMode);
     }
 
@@ -40,6 +33,20 @@ public class SettingsManager : MonoBehaviour
         Screen.fullScreenMode = (FullScreenMode)mode;
     }
 
+    public void UpdateSettingsView()
+    {
+        PlayerNameField.text = PlayerSettings.Instance.PlayerName;
+
+        string rolesTxt = "";
+        for (int i = 0; i < NetworkingGlobal.LoadedRoleTypes.Count; ++i)
+        {
+            rolesTxt += $"[{NetworkingGlobal.LoadedRoleHashes[i]}] {NetworkingGlobal.LoadedRoleTypes.Keys.ElementAt(i)} ({NetworkingGlobal.LoadedRoleTypes.Values.ElementAt(i).AssemblyQualifiedName}){Environment.NewLine}";
+        }
+        LoadedRolesText.SetText(rolesTxt);
+
+        WindowModeDropdown.value = (int)Screen.fullScreenMode;
+    }
+
     public void SaveSettings()
-        => PlayerSettings.Instance.SaveConfig();
+        => PlayerSettings.SaveConfig();
 }

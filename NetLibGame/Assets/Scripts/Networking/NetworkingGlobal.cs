@@ -44,17 +44,7 @@ public static class NetworkingGlobal
     public static List<NetWerewolfPlayer> ConnectedPlayers => players;
     public static WerewolfGameInfo GameInfo => gameInfo;
 
-
-    static NetworkingGlobal()
-    {
-        PlayerSettings.LoadConfig();
-
-        // We must shut down the server and/or client when the editor stops, since that doesn't happen automatically for us.
-        Application.wantsToQuit += Application_quitting;
-        LoadAllRoles();
-    }
-
-    private static void LoadAllRoles()
+    public static void LoadAllRoles()
     {
         List<Assembly> roleAsms = new List<Assembly>();
         roleAsms.Add(Assembly.GetExecutingAssembly()); // This assembly to load the internal roles.
@@ -77,7 +67,7 @@ public static class NetworkingGlobal
         LoadedRoleHashes = WerewolfGameInfo.GenerateRoleHashes(LoadedRoleTypes.Values.ToArray());
     }
 
-    private static bool Application_quitting()
+    public static bool Application_quitting()
     {
         CloseClientInstance();
         CloseServerInstance();
