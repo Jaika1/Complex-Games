@@ -1,4 +1,4 @@
-﻿using NetworkingLibrary;
+﻿using Jaika1.Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +75,7 @@ public sealed class ServerNetEvents
         {
             NetBase.WriteDebug($"Received role hash list from {sender.EndPoint as IPEndPoint} \"{playerName}\" has less roles than the server, impossible to verify roles.");
             ConnectedPlayers.Remove(sender.GetPlayer());
-            sender.Disconnect();
+            sender.Close();
             return;
         }
 
@@ -86,7 +86,7 @@ public sealed class ServerNetEvents
             {
                 NetBase.WriteDebug($"Client {sender.EndPoint as IPEndPoint} \"{playerName}\" missing hash {hash} corresponding to role {LoadedRoleTypes.Values.ElementAt(i).AssemblyQualifiedName}!");
                 ConnectedPlayers.Remove(sender.GetPlayer());
-                sender.Disconnect();
+                sender.Close();
                 return;
             }
             else

@@ -1,4 +1,4 @@
-﻿using NetworkingLibrary;
+﻿using Jaika1.Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -102,7 +102,7 @@ public static class NetworkingGlobal
         {
             if (udpSv != null)
             {
-                udpSv.CloseServer();
+                udpSv.Close();
                 udpSv = null;
                 players = null;
             }
@@ -116,7 +116,7 @@ public static class NetworkingGlobal
         {
             if (udpCl != null)
             {
-                udpCl.Disconnect();
+                udpCl.Close();
                 udpCl = null;
 
                 if (udpSv == null)
