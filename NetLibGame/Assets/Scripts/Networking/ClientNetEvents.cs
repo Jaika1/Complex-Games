@@ -32,7 +32,7 @@ public sealed class ClientNetEvents
     [NetDataEvent(0, ClientEventGroup)]
     static void CreateRoleHashesAndVerify(UdpClient client)
     {
-        client.SendF(0, PacketFlags.None, LocalPlayer.Name, LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
+        client.SendF(0, PacketFlags.Reliable, LocalPlayer.Name, LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
     }
 
     [NetDataEvent(1, ClientEventGroup)]

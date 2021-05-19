@@ -208,32 +208,32 @@ public static class NetworkingGlobal
                 switch (CurrentGameState)
                 {
                     case GameState.Discussion:
-                        ServerInstance.Send(5, 0u, "Discussion has begun.");
+                        ServerInstance.SendF(5,PacketFlags.Reliable, 0u, "Discussion has begun.");
                         break;
 
                     case GameState.Night:
-                        ServerInstance.Send(5, 0u, "The sun has retreated as the moon rises...");
+                        ServerInstance.SendF(5, PacketFlags.Reliable, 0u, "The sun has retreated as the moon rises...");
                         break;
 
                     case GameState.Dawn:
                         List<NetWerewolfPlayer> affectedPlayers = GameInfo.ResolveNightEvents().ConvertAll(p => p as NetWerewolfPlayer);
                         affectedPlayers.ForEach(p =>
                         {
-                            ServerInstance.Send(50, p.PlayerID, p.Status); // UpdatePlayerStatus(UdpClient, uint, PlayerStatus)
-                            ServerInstance.Send(5, 0u, $"{p.Name} is {p.Status}!{(p.Status == PlayerStatus.Dead ? $" Their role was {p.Role.Name}" : "")}");
+                            ServerInstance.SendF(50, PacketFlags.Reliable, p.PlayerID, p.Status); // UpdatePlayerStatus(UdpClient, uint, PlayerStatus)
+                            ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"{p.Name} is {p.Status}!{(p.Status == PlayerStatus.Dead ? $" Their role was {p.Role.Name}" : "")}");
                         });
                         break;
 
                     case GameState.Trial:
                         if (PlayerOnTrial != null)
                         {
-                            ServerInstance.Send(5, 0u, $"The town has decided to trial {PlayerOnTrial.Name}! Select their name to vote them guilty.");
+                            ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"The town has decided to trial {PlayerOnTrial.Name}! Select their name to vote them guilty.");
                         }
                         else StateTime = 0;
                         break;
 
                     case GameState.End:
-                        ServerInstance.Send(5, 0u, $"The following players have won: {string.Join(", ", ConnectedPlayers.Where(p => WinningAlignments.Contains(p.Role.Alignment)).Select(p => p.Name))}");
+                        ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"The following players have won: {string.Join(", ", ConnectedPlayers.Where(p => WinningAlignments.Contains(p.Role.Alignment)).Select(p => p.Name))}");
                         break;
                 }
             }
@@ -284,8 +284,8 @@ public static class NetworkingGlobal
                             if (votes >= Mathf.CeilToInt(voters / 2.0f))
                             {
                                 PlayerOnTrial.Status = PlayerStatus.Dead;
-                                ServerInstance.Send(50, PlayerOnTrial.PlayerID, PlayerOnTrial.Status); // UpdatePlayerStatus(uint, PlayerStatus)
-                                ServerInstance.Send(5, 0u, $"The town has decided to execute {PlayerOnTrial.Name}! They were a {PlayerOnTrial.Role.Name}!");
+                                ServerInstance.SendF(50, PacketFlags.Reliable, PlayerOnTrial.PlayerID, PlayerOnTrial.Status); // UpdatePlayerStatus(uint, PlayerStatus)
+                                ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"The town has decided to execute {PlayerOnTrial.Name}! They were a {PlayerOnTrial.Role.Name}!");
 
                                 (bool End, IRoleAlignment[] WinList) trialResult = GameInfo.CheckIfWinConditionMet();
 
@@ -319,7 +319,7 @@ public static class NetworkingGlobal
                         ActiveRoleHashes = new List<string>();
                         PlayerOnTrial = null;
 
-                        ServerInstance.Send(192); // InvokeSceneFlip();
+                        ServerInstance.SendF(192, PacketFlags.Reliable); // InvokeSceneFlip();
                         return;
                 }
                 StateChanged = true;

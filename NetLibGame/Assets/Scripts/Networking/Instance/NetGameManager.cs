@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jaika1.Networking;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -76,7 +77,7 @@ public class NetGameManager : MonoBehaviour
     public void SendChatMessage(string submission)
     {
         if (!string.IsNullOrWhiteSpace(submission))
-            NetworkingGlobal.ClientInstance.Send(5, submission); // BroadcastChatMessage(string);
+            NetworkingGlobal.ClientInstance.SendF(5, PacketFlags.Reliable, submission); // BroadcastChatMessage(string);
 
         ChatBoxInputField.text = string.Empty;
         ChatBoxInputField.Select();

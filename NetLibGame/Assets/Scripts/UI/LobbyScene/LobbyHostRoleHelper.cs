@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jaika1.Networking;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -24,6 +25,6 @@ public class LobbyHostRoleHelper : MonoBehaviour
 
     public static void SendEditRoleList(string roleHash, bool remove)
     {
-        NetworkingGlobal.ClientInstance.Send(190, roleHash, remove); // ModifyActiveRoleList(string, bool);
+        NetworkingGlobal.ClientInstance.SendF(190, PacketFlags.Reliable, roleHash, remove); // ModifyActiveRoleList(string, bool);
     }
 }

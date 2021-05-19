@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jaika1.Networking;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -180,7 +181,7 @@ public class LobbyManager : MonoBehaviour
     public void SendChatMessage(string submission)
     {
         if (!string.IsNullOrWhiteSpace(submission))
-            NetworkingGlobal.ClientInstance.Send(5, submission); // BroadcastChatMessage(string);
+            NetworkingGlobal.ClientInstance.SendF(5, PacketFlags.Reliable, submission); // BroadcastChatMessage(string);
 
         ChatBoxInputField.text = string.Empty;
         ChatBoxInputField.Select();
@@ -189,7 +190,7 @@ public class LobbyManager : MonoBehaviour
 
     public void SendTryStartGame()
     {
-        NetworkingGlobal.ClientInstance.Send(191);
+        NetworkingGlobal.ClientInstance.SendF(191, PacketFlags.Reliable);
     }
 
     public void QuitToMenu()
