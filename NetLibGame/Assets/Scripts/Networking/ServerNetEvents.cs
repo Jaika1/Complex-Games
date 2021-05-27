@@ -37,13 +37,17 @@ public sealed class ServerNetEvents
         }
         catch { }
 
-        NetWerewolfPlayer nextHost = ConnectedPlayers.First();
-        if (nextHost != null && !nextHost.IsHost)
+        try
         {
-            nextHost.IsHost = true;
-            nextHost.PlayerClient.SendF(199, PacketFlags.Reliable, true);
-            ServerInstance.SendF(5, PacketFlags.Reliable, 0, $"{nextHost.Name} is now the game master.");
+            NetWerewolfPlayer nextHost = ConnectedPlayers.First();
+            if (nextHost != null && !nextHost.IsHost)
+            {
+                nextHost.IsHost = true;
+                nextHost.PlayerClient.SendF(199, PacketFlags.Reliable, true);
+                ServerInstance.SendF(5, PacketFlags.Reliable, 0, $"{nextHost.Name} is now the game master.");
+            }
         }
+        catch { } // No players left to be host
     }
 
     #endregion

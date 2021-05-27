@@ -195,8 +195,6 @@ public class LobbyManager : MonoBehaviour
 
     public void QuitToMenu()
     {
-        NetworkingGlobal.FirstLobby = true;
-        NetworkingGlobal.ActiveRoleHashes = new List<string>();
         NetworkingGlobal.CloseClientInstance();
         NetworkingGlobal.CloseServerInstance();
 

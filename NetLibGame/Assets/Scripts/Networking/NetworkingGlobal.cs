@@ -105,9 +105,15 @@ public static class NetworkingGlobal
                 udpSv.Close();
                 udpSv = null;
                 players = null;
+
+                NetworkingGlobal.FirstLobby = true;
+                NetworkingGlobal.ActiveRoleHashes = new List<string>();
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+        }
     }
 
     public static void CloseClientInstance()
@@ -123,7 +129,10 @@ public static class NetworkingGlobal
                     players = null;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+        }
     }
 
     public static string GetRoleNameFromHash(string roleHash)
