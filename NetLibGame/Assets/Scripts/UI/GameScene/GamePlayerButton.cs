@@ -1,4 +1,4 @@
-﻿using Jaika1.Networking;
+﻿using NetworkingLibrary;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -33,5 +33,5 @@ public class GamePlayerButton : MonoBehaviour
         PlayerSelectorButton.interactable = canSelect;
 
     public void PerformActionAgainst() =>
-        NetworkingGlobal.ClientInstance.SendF(20, PacketFlags.Reliable, PlayerID);
+        NetworkingGlobal.ClientInstance.Send(20, PlayerID);
 }

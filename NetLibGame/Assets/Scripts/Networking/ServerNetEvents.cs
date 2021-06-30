@@ -1,4 +1,4 @@
-﻿using Jaika1.Networking;
+﻿using NetworkingLibrary;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,15 +20,15 @@ public sealed class ServerNetEvents
     public static void ClientConnectedEventHandler(UdpClient client)
     {
         ConnectedPlayers.Add(new NetWerewolfPlayer(client));
-        client.SendF(0, PacketFlags.Reliable); // CreateRoleHashesAndVerify()
+        client.Send(0); // CreateRoleHashesAndVerify()
     }
 
     public static void ClientDisconnectedEventHandler(UdpClient client)
     {
         NetWerewolfPlayer player = client.GetPlayer();
         player.Status = PlayerStatus.Dead;
-        ServerInstance.SendF(2, PacketFlags.Reliable, player.PlayerID); // RemoteClientDisconnected(uint)
-        ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"{player.Name} has fallen...");
+        ServerInstance.Send(2, player.PlayerID); // RemoteClientDisconnected(uint)
+        ServerInstance.Send(5, 0u, $"{player.Name} has fallen...");
 
         try
         {
@@ -43,8 +43,8 @@ public sealed class ServerNetEvents
             if (nextHost != null && !nextHost.IsHost)
             {
                 nextHost.IsHost = true;
-                nextHost.PlayerClient.SendF(199, PacketFlags.Reliable, true);
-                ServerInstance.SendF(5, PacketFlags.Reliable, 0, $"{nextHost.Name} is now the game master.");
+                nextHost.PlayerClient.Send(199, true);
+                ServerInstance.Send(5, 0, $"{nextHost.Name} is now the game master.");
             }
         }
         catch { } // No players left to be host
@@ -79,7 +79,7 @@ public sealed class ServerNetEvents
         {
             NetBase.WriteDebug($"Received role hash list from {sender.EndPoint as IPEndPoint} \"{playerName}\" has less roles than the server, impossible to verify roles.");
             ConnectedPlayers.Remove(sender.GetPlayer());
-            sender.Close();
+            sender.Disconnect();
             return;
         }
 
@@ -90,7 +90,7 @@ public sealed class ServerNetEvents
             {
                 NetBase.WriteDebug($"Client {sender.EndPoint as IPEndPoint} \"{playerName}\" missing hash {hash} corresponding to role {LoadedRoleTypes.Values.ElementAt(i).AssemblyQualifiedName}!");
                 ConnectedPlayers.Remove(sender.GetPlayer());
-                sender.Close();
+                sender.Disconnect();
                 return;
             }
             else
@@ -105,21 +105,21 @@ public sealed class ServerNetEvents
 
         GameInfo.AddPlayerAndAssignId(playerRef);
 
-        ServerInstance.SendF(5, PacketFlags.Reliable, 0u, GenRandomJoinMessage(playerName));
+        ServerInstance.Send(5, 0u, GenRandomJoinMessage(playerName));
 
         if (GameInfo.Players.Count == 1)
         {
             playerRef.IsHost = true;
-            sender.SendF(199, PacketFlags.Reliable, true); //SetHost(UdpClient, bool)
-            ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"{playerRef.Name} is now the game master.");
+            sender.Send(199, true); //SetHost(UdpClient, bool)
+            ServerInstance.Send(5, 0u, $"{playerRef.Name} is now the game master.");
         }
 
-        sender.SendF(200, PacketFlags.Reliable, playerRef.PlayerID, ConnectedPlayers.Select(p => p.PlayerID).ToArray(), ConnectedPlayers.Select(p => p.Name).ToArray()); // ReceivePlayerList(uint, uint[], string[]);
+        sender.Send(200, playerRef.PlayerID, ConnectedPlayers.Select(p => p.PlayerID).ToArray(), ConnectedPlayers.Select(p => p.Name).ToArray()); // ReceivePlayerList(uint, uint[], string[]);
 
         foreach (string hash in ActiveRoleHashes)
-            sender.SendF(190, PacketFlags.Reliable, hash, false);
+            sender.Send(190, hash, false);
 
-        ServerInstance.SendF(1, PacketFlags.Reliable, playerRef.PlayerID, playerRef.Name); // UpdateClientInfo(uint, string)
+        ServerInstance.Send(1, playerRef.PlayerID, playerRef.Name); // UpdateClientInfo(uint, string)
     }
 
     [NetDataEvent(5, ServerEventGroup)]
@@ -131,12 +131,12 @@ public sealed class ServerNetEvents
             double secondsSinceLast = (DateTime.Now - p.LastMessageTime).TotalSeconds;
             if (secondsSinceLast >= 3.5)
             {
-                ServerInstance.SendF(5, PacketFlags.Reliable, p.PlayerID, message); // ReceivedChatMessage(uint, string)
+                ServerInstance.Send(5, p.PlayerID, message); // ReceivedChatMessage(uint, string)
                 p.LastMessageTime = DateTime.Now;
             }
             else
             {
-                sender.SendF(5, PacketFlags.Reliable, 0, $"Please wait another {Math.Round(3.5 - secondsSinceLast, 1)} seconds before sending another message."); // ReceivedChatMessage(uint, string)
+                sender.Send(5, 0, $"Please wait another {Math.Round(3.5 - secondsSinceLast, 1)} seconds before sending another message."); // ReceivedChatMessage(uint, string)
             }
         }
     }
@@ -150,36 +150,36 @@ public sealed class ServerNetEvents
         switch (player.Status)
         {
             case PlayerStatus.Dead:
-                sender.SendF(5, PacketFlags.Reliable, 0u, $"You are dead and cannot perform any more actions!");
+                sender.Send(5, 0u, $"You are dead and cannot perform any more actions!");
                 return;
             case PlayerStatus.Spectating:
-                sender.SendF(5, PacketFlags.Reliable, 0u, $"Spectators cannot perform in-game actions.");
+                sender.Send(5, 0u, $"Spectators cannot perform in-game actions.");
                 return;
         }
 
         if (target == null)
         {
-            sender.SendF(5, PacketFlags.Reliable, 0u, $"Targeted player with ID {pid} not found.");
+            sender.Send(5, 0u, $"Targeted player with ID {pid} not found.");
             return;
         }
 
         if (CurrentDay == 0 && CurrentGameState == GameState.Discussion)
         {
-            sender.SendF(5, PacketFlags.Reliable, 0u, $"No votes for execution will be considered until the first night is over!");
+            sender.Send(5, 0u, $"No votes for execution will be considered until the first night is over!");
             return;
         }
 
         switch (CurrentGameState)
         {
             case GameState.Dawn:
-                sender.SendF(5, PacketFlags.Reliable, 0u, $"Please wait until dawn is over to begin voting.");
+                sender.Send(5, 0u, $"Please wait until dawn is over to begin voting.");
                 break;
 
             case GameState.Discussion:
                 // TODO: Vote against player
                 if (target.PlayerID == player.PlayerID)
                 {
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"You cannot vote yourself onto trial!");
+                    sender.Send(5, 0u, $"You cannot vote yourself onto trial!");
                     break;
                 }
 
@@ -187,7 +187,7 @@ public sealed class ServerNetEvents
                 {
                     player.TrialTargetPID = target.PlayerID;
                     target.TrialVotes++;
-                    ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"{player.Name} has voted to trial {target.Name}! ({target.TrialVotes}/2)");
+                    ServerInstance.Send(5, 0u, $"{player.Name} has voted to trial {target.Name}! ({target.TrialVotes}/2)");
 
                     if (target.TrialVotes >= 2 && PlayerOnTrial == null)
                     {
@@ -202,7 +202,7 @@ public sealed class ServerNetEvents
                 {
                     player.TrialTargetPID = 0u;
                     target.TrialVotes--;
-                    ServerInstance.SendF(5, PacketFlags.Reliable, 0u, $"{player.Name} has revoked their vote to trial {target.Name}. ({target.TrialVotes}/2)");
+                    ServerInstance.Send(5, 0u, $"{player.Name} has revoked their vote to trial {target.Name}. ({target.TrialVotes}/2)");
                 }
 
                 break;
@@ -212,20 +212,20 @@ public sealed class ServerNetEvents
                 {
                     if (player.PlayerID == PlayerOnTrial.PlayerID)
                     {
-                        sender.SendF(5, PacketFlags.Reliable, 0u, $"You are on trial and cannot vote to execute yourself!");
+                        sender.Send(5, 0u, $"You are on trial and cannot vote to execute yourself!");
                         break;
                     }
 
                     player.VotedForKill = !player.VotedForKill;
 
                     if (player.VotedForKill)
-                        sender.SendF(5, PacketFlags.Reliable, 0u, $"You have voted to kill {PlayerOnTrial.Name}.");
+                        sender.Send(5, 0u, $"You have voted to kill {PlayerOnTrial.Name}.");
                     else
-                        sender.SendF(5, PacketFlags.Reliable, 0u, $"You have decided to revoke your vote to kill {PlayerOnTrial.Name}.");
+                        sender.Send(5, 0u, $"You have decided to revoke your vote to kill {PlayerOnTrial.Name}.");
                 }
                 else
                 {
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"The player who was on trial can no longer be voted against.");
+                    sender.Send(5, 0u, $"The player who was on trial can no longer be voted against.");
                 }
                 break;
 
@@ -233,31 +233,31 @@ public sealed class ServerNetEvents
                 // TODO: Night abilities
                 if (player.Role.NightEvent == null)
                 {
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"The {player.Role.Name} role does not have a night ability!");
+                    sender.Send(5, 0u, $"The {player.Role.Name} role does not have a night ability!");
                     break;
                 }
 
                 if (player.Role.NightEvent.EventTargets == 0)
                 {
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"Your night ability is passive and does not require a target.");
+                    sender.Send(5, 0u, $"Your night ability is passive and does not require a target.");
                     break;
                 }
 
                 if (player.Role.NightEvent.TargetPlayers[0] == null || player.Role.NightEvent.TargetPlayers[0].PlayerID != target.PlayerID)
                 {
                     player.Role.NightEvent.TargetPlayers[0] = target;
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"You have decided to target {target.Name}."); // TODO: custom action text
+                    sender.Send(5, 0u, $"You have decided to target {target.Name}."); // TODO: custom action text
                 }
                 else
                 {
                     player.Role.NightEvent.TargetPlayers[0] = null;
-                    sender.SendF(5, PacketFlags.Reliable, 0u, $"You have instead decided not to perform your night ability.");
+                    sender.Send(5, 0u, $"You have instead decided not to perform your night ability.");
                 }
 
                 break;
 
             case GameState.End:
-                sender.SendF(5, PacketFlags.Reliable, 0u, $"The game is already over!");
+                sender.Send(5, 0u, $"The game is already over!");
                 break;
         }
     }
@@ -279,7 +279,7 @@ public sealed class ServerNetEvents
             ActiveRoleHashes.Add(roleHash);
         }
 
-        ServerInstance.SendF(190, PacketFlags.Reliable, roleHash, remove); // ModifyActiveRoleList(string, bool)
+        ServerInstance.Send(190, roleHash, remove); // ModifyActiveRoleList(string, bool)
     }
 
     [NetDataEvent(191, ServerEventGroup)]
@@ -287,17 +287,17 @@ public sealed class ServerNetEvents
     {
         if (GameInfo.Players.Count < MIN_PLAYERS)
         {
-            sender.SendF(5, PacketFlags.Reliable, 0u, $"There must be at least {MIN_PLAYERS} players to start the round.");
+            sender.Send(5, 0u, $"There must be at least {MIN_PLAYERS} players to start the round.");
             return;
         }
         if (ActiveRoleHashes.Count < MIN_PLAYERS)
         {
-            sender.SendF(5, PacketFlags.Reliable, 0u, $"There must be enough roles in the active list for at least {MIN_PLAYERS} players.");
+            sender.Send(5, 0u, $"There must be enough roles in the active list for at least {MIN_PLAYERS} players.");
             return;
         }
         if (ActiveRoleHashes.Count > GameInfo.Players.Count)
         {
-            sender.SendF(5, PacketFlags.Reliable, 0u, $"There are more active roles than there are players! ({ActiveRoleHashes.Count}/{GameInfo.Players.Count})");
+            sender.Send(5, 0u, $"There are more active roles than there are players! ({ActiveRoleHashes.Count}/{GameInfo.Players.Count})");
             return;
         }
 
@@ -310,7 +310,7 @@ public sealed class ServerNetEvents
         GameInfo.AssignRolesAndSpectators(ActiveRoleHashes.Count, roleTypes);
 
         foreach (NetWerewolfPlayer p in ConnectedPlayers)
-            p.PlayerClient.SendF(191, PacketFlags.Reliable, GetRoleHashFromType(p.Role.GetType()));
+            p.PlayerClient.Send(191, GetRoleHashFromType(p.Role.GetType()));
 
         GameLoopCT = new CancellationToken(false);
         _ = Task.Run(NetGameLoop, GameLoopCT);

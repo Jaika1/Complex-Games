@@ -1,4 +1,4 @@
-﻿using Jaika1.Networking;
+﻿using NetworkingLibrary;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +18,7 @@ public class OpeningManager : MonoBehaviour
 
         PlayerSettings.LoadConfig();
         NetworkingGlobal.LoadAllRoles();
-        //NetBase.DebugInfoReceived += s => Debug.Log(s);
+        NetBase.DebugInfoReceived += s => Debug.Log(s);
         
         // We must shut down the server and/or client when the editor stops, since that doesn't happen automatically for us.
         Application.wantsToQuit += NetworkingGlobal.Application_quitting;

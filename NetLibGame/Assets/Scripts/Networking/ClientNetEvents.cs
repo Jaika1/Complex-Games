@@ -1,4 +1,4 @@
-﻿using Jaika1.Networking;
+﻿using NetworkingLibrary;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ public sealed class ClientNetEvents
     [NetDataEvent(0, ClientEventGroup)]
     static void CreateRoleHashesAndVerify(UdpClient client)
     {
-        client.SendF(0, PacketFlags.Reliable, LocalPlayer.Name, LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
+        client.Send(0, LocalPlayer.Name, LoadedRoleHashes.ToArray()); // VerifyRoleHashesAndSendClientList(string, string[])
     }
 
     [NetDataEvent(1, ClientEventGroup)]
